@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <conio.h>
 #include <fstream>
 #include <random>
 #include <vector>
@@ -12,10 +13,14 @@ using namespace std;
 //class for Node objects
 class Node {
 private:
+    int num;
     double x;
     double y;
 public:
-    Node(double newX, double newY) : x(newX), y(newY){};
+    Node(int newNum, double newX, double newY) : num(newNum), x(newX), y(newY){};
+    int getNum(){
+        return num;
+    }
     double getX(){
         return x;
     }
@@ -46,19 +51,21 @@ double searchUntilEnter(vector<Node>& Path){
     random_device rd;
     default_random_engine rng(rd());
     while(1){
-        //break loop if enter pressed *FIX*
-        getline(cin, inputLine);
-        if (inputLine == "\n"){
-            cout << "Final shortest distance: " << shortestDistance << endl;
-            break;
+        if (_kbhit()){
+            char input = _getch();
+            if (input == '\r'){
+                break;
+            }
         }
         shuffle(Path.begin() + 1, Path.end() - 1, rng);
         double currDistance = totalDistance(Path);
+        currDistance = currDistance - fmod(currDistance, 0.1);
         if (currDistance < shortestDistance){
             shortestDistance = currDistance;
             cout << "       " << shortestDistance << endl;
         }
     }
+    return ceil(shortestDistance);
 }
 
 int main() {
@@ -75,18 +82,22 @@ int main() {
         cout << "Error" << endl;
     }
     double A, B;
+    int currPos = 1;
     while (inputFile >> A >> B){
-        Path.push_back(Node(A, B));
+        Path.push_back(Node(currPos, A, B));
+        currPos++;
     }
+    Node startAndEnd(Path[0]);
+    Path.push_back(startAndEnd);
     inputFile.close();
 
     cout << "First Path Order: ";
     for (int j = 0; j < Path.size(); ++j){
         if (j < Path.size() - 1){
-            cout << "(" << Path[j].getX() << ", " << Path[j].getY() << ") to ";
+            cout << Path[j].getNum() << " to ";
         }
         else{
-            cout << "(" << Path[j].getX() << ", " << Path[j].getY() << ")";
+            cout << Path[j].getNum();
         }
     }
 
@@ -102,13 +113,13 @@ int main() {
     cout << "Shortest Path Order: ";
     for (int j = 0; j < Path.size(); ++j){
         if (j < Path.size() - 1){
-            cout << "(" << Path[j].getX() << ", " << Path[j].getY() << ") to ";
+            cout << Path[j].getNum() << " to ";
         }
         else{
-            cout << "(" << Path[j].getX() << ", " << Path[j].getY() << ")";
+            cout << Path[j].getNum();
         }
     }
-    cout << "Shortest Path Image: *Image here*";
+    cout << endl << "Shortest Path Image: *Image here*";
 
     return 0;
 }
