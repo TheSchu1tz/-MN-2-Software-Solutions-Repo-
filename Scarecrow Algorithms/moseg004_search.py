@@ -2,7 +2,14 @@ import random
 import math
 import time
 import os
+import threading
 
+
+stop = False
+def wait_for_key():
+    global stop
+    input()
+    stop = True
 #MO: This is a basic search that searching random permutations of the path to find the optimal one
 def dumb_search(coordinates: list):
 
@@ -11,25 +18,25 @@ def dumb_search(coordinates: list):
 
     start = time.time() #MO: This is to time the search
 
-    try:
-        while(True):
-            curr_solution = 0
-            trees_coords = coordinates[1:-1]
-            random.shuffle(trees_coords)
-            coordinates[1:-1] = trees_coords
-            for i in range(len(coordinates) - 1):
-                left = coordinates[i]
-                right = coordinates[i+1]
-                curr_solution += math.dist(left, right)
-            
-            if curr_solution < best_solution:
-                end = time.time()
-                print(f"\t\t{curr_solution}m found at {round(end - start, 2)}s")
-                best_solution = curr_solution
-                best_path = coordinates
-    except:
-        KeyboardInterrupt
-        return best_solution, best_path
+    threading.Thread(target=wait_for_key, daemon=True).start()
+   
+    while(not stop):
+        curr_solution = 0
+        trees_coords = coordinates[1:-1]
+        random.shuffle(trees_coords)
+        coordinates[1:-1] = trees_coords
+        for i in range(len(coordinates) - 1):
+            left = coordinates[i]
+            right = coordinates[i+1]
+            curr_solution += math.dist(left, right)
+        
+        if curr_solution < best_solution:
+            end = time.time()
+            print(f"\t\t{curr_solution}m found at {round(end - start, 2)}s")
+            best_solution = curr_solution
+            best_path = coordinates
+    
+    return best_solution, best_path
 
 #MO: This is a modified basic search that incorporates pruning whenever a distance 
 #MO: found is greater than the current best solution
@@ -41,30 +48,30 @@ def prune_search(coordinates: list):
 
     start = time.time() #MO: This is to time the search
 
-    try:
-        while(True):
-            curr_solution = 0
-            trees_coords = coordinates[1:-1]
-            random.shuffle(trees_coords)
-            coordinates[1:-1] = trees_coords
-            for i in range(len(coordinates) - 1):
-                left = coordinates[i]
-                right = coordinates[i+1]
-                left_right_dist = math.dist(left, right)
-                if left_right_dist >= best_solution:
-                    pruned = True
-                    break
-                curr_solution += left_right_dist
-            
-            if curr_solution < best_solution and not pruned:
-                end = time.time()
-                print(f"\t\t{curr_solution}m found at {round(end - start, 2)}s")
-                best_solution = curr_solution
-                best_path = coordinates
-            pruned = False
-    except:
-        KeyboardInterrupt
-        return best_solution, best_path
+    threading.Thread(target=wait_for_key, daemon=True).start()
+    
+    while(not stop):
+        curr_solution = 0
+        trees_coords = coordinates[1:-1]
+        random.shuffle(trees_coords)
+        coordinates[1:-1] = trees_coords
+        for i in range(len(coordinates) - 1):
+            left = coordinates[i]
+            right = coordinates[i+1]
+            left_right_dist = math.dist(left, right)
+            if left_right_dist >= best_solution:
+                pruned = True
+                break
+            curr_solution += left_right_dist
+        
+        if curr_solution < best_solution and not pruned:
+            end = time.time()
+            print(f"\t\t{curr_solution}m found at {round(end - start, 2)}s")
+            best_solution = curr_solution
+            best_path = coordinates
+        pruned = False
+
+    return best_solution, best_path
 
 if __name__=="__main__":
 
