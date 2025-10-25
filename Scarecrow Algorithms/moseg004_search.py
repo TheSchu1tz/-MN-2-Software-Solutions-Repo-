@@ -166,8 +166,8 @@ if __name__=="__main__":
     
     print(f"There are {len(coordinates)} nodes, calculating route..\n\tShortest Route Discovered So Far")
     #best_solution, best_path = dumb_search(coordinates)
-    #best_solution, best_path = prune_search(coordinates)
-    best_solution, best_path = NN_prune_search(coordinates)
+    best_solution, best_path = prune_search(coordinates)
+    #best_solution, best_path = NN_prune_search(coordinates)
     solution_filename = "test_solutions/" + os.path.basename(filename) + "_solution_" + str(best_solution) + ".txt"
 
     with open(solution_filename, 'w') as f:
