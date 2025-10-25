@@ -45,7 +45,7 @@ double totalDistance(vector<Node>& currPath) {
 }
 
 //randomly shuffles order, replacing shortestDistance if new shortest is generated (outputs final shortest in place of eventual .txt output with all information)
-double randomSearchUntilEnter(vector<Node>& Path, vector<Node>& shortestPath){
+int randomSearchUntilEnter(vector<Node>& Path, vector<Node>& shortestPath){
     double shortestDistance = INFINITY;
     shortestPath = Path;
     random_device rd;
@@ -86,6 +86,7 @@ int main() {
     //variable declarations
     string fileName;
     ifstream inputFile;
+    ofstream outputFile;
     vector<Node> Path;
     vector<Node> shortestPath;
 
@@ -94,7 +95,8 @@ int main() {
     cin >> fileName;
     inputFile.open(fileName);
     if (!inputFile.is_open()){
-        cout << "Error" << endl;
+        cerr << "Error opening input file" << endl;
+        return 1;
     }
     double A, B;
     int currPos = 1;
@@ -106,35 +108,56 @@ int main() {
     Path.push_back(startAndEnd);
     inputFile.close();
 
-    cout << "First Path Order: ";
-    for (int j = 0; j < Path.size(); ++j){
-        if (j < Path.size() - 1){
-            cout << Path[j].getNum() << ", ";
-        }
-        else{
-            cout << Path[j].getNum();
-        }
-    }
+    // cout << "First Path Order: ";
+    // for (int j = 0; j < Path.size(); ++j){
+    //     if (j < Path.size() - 1){
+    //         cout << Path[j].getNum() << ", ";
+    //     }
+    //     else{
+    //         cout << Path[j].getNum();
+    //     }
+    // }
 
     //begin outputting shortest paths
-    cout << endl << "There are " << Path.size() << " nodes, computing shortest route.." << endl;
+    cout << "There are " << Path.size() << " nodes, computing shortest route.." << endl;
     cout << "   Shortest Route Discovered So Far " << endl;
 
     //function runs until 'Enter' pressed, outputting 
-    double resultDistance = randomSearchUntilEnter(Path, shortestPath);
+    int resultDistance = randomSearchUntilEnter(Path, shortestPath);
 
-    cout << endl << "==========Results==========" << endl;
-    cout << "Shortest Path Distance: " << resultDistance << endl;
-    cout << "Shortest Path Order: ";
+    string fileOut = "";
+    fileOut = fileName.substr(8, (fileName.size() - 4)) + "_SOLUTION_" + to_string(resultDistance) + ".txt";
+
+    outputFile.open(fileOut);
+    if (!outputFile.is_open()){
+        cerr << "Error opening/creating output file" << endl;
+        return 2;
+    }
+
+    cout << "Route written to disk as " << fileOut << endl;
     for (int j = 0; j < shortestPath.size(); ++j){
         if (j < shortestPath.size() - 1){
-            cout << shortestPath[j].getNum() << ", ";
+            outputFile << shortestPath[j].getNum() << ' ';
         }
         else{
-            cout << shortestPath[j].getNum();
+            outputFile << shortestPath[j].getNum();
         }
     }
-    cout << endl << "Shortest Path Image: *Image here*";
+
+    outputFile.close();
+
+    // cout << endl << "==========Results==========" << endl;
+    // cout << "Shortest Path Distance: " << resultDistance << endl;
+    // cout << "Shortest Path Order: ";
+    // for (int j = 0; j < shortestPath.size(); ++j){
+    //     if (j < shortestPath.size() - 1){
+    //         cout << shortestPath[j].getNum() << ", ";
+    //     }
+    //     else{
+    //         cout << shortestPath[j].getNum();
+    //     }
+    // }
+    // cout << endl << "Shortest Path Image: *Image here*";
 
     return 0;
 }
