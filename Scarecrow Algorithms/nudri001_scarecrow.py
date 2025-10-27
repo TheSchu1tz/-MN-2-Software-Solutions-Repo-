@@ -2,6 +2,8 @@ import numpy
 import math
 import random
 import keyboard
+import threading
+import time
 import os
 
 def main():
@@ -107,6 +109,51 @@ def WriteSolution(filepath, bestCost, bestOrder):
     outputFile.write(f"{bestOrder}")
     outputFile.close()
     return outputPath
+
+#MO: Need this to end execution on enter keystroke. REQUIRED FOR MACOS
+stop = False
+def wait_for_key():
+    global stop
+    input()
+    stop = True
+
+#MO: This is a modified basic search that incorporates pruning whenever a distance 
+#MO: found is greater than the current best solution
+def prune_search(coordinates: list):
+
+    best_solution = float("inf")
+    #best_path = coordinates.copy()
+    best_path = []
+    coord_indexes = [i for i in range(len(coordinates))]
+
+    pruned = False
+
+    start = time.time() #MO: This is to time the search
+
+    threading.Thread(target=wait_for_key, daemon=True).start()
+    
+    while(not stop):
+        curr_solution = 0.0
+        trees_coords = coord_indexes[1:].copy()
+        random.shuffle(trees_coords)
+        curr_path = [0] + trees_coords + [0]
+        pruned = False
+
+        for i in range(len(curr_path) - 1):
+            left = coordinates[curr_path[i]]
+            right = coordinates[curr_path[i+1]]
+            curr_solution += math.dist(left, right)
+            if curr_solution >= best_solution:
+                pruned = True
+                break
+        
+        if curr_solution < best_solution and not pruned:
+            end = time.time()
+            print(f"\t\t{curr_solution}m found at {round(end - start, 2)}s")
+            best_solution = curr_solution
+            best_path = curr_path.copy()
+        
+    return best_solution, best_path
 
 if __name__ == "__main__":
     main()

@@ -54,7 +54,10 @@ def dumb_search(coordinates: list):
 def prune_search(coordinates: list):
 
     best_solution = float("inf")
-    best_path = coordinates.copy()
+    #best_path = coordinates.copy()
+    best_path = []
+    coord_indexes = [i for i in range(len(coordinates))]
+
     pruned = False
 
     start = time.time() #MO: This is to time the search
@@ -62,13 +65,15 @@ def prune_search(coordinates: list):
     threading.Thread(target=wait_for_key, daemon=True).start()
     
     while(not stop):
-        curr_solution = 0
-        trees_coords = coordinates[1:]
+        curr_solution = 0.0
+        trees_coords = coord_indexes[1:].copy()
         random.shuffle(trees_coords)
-        curr_path = [coordinates[0]] + trees_coords + [coordinates[0]]
+        curr_path = [0] + trees_coords + [0]
+        pruned = False
+
         for i in range(len(curr_path) - 1):
-            left = curr_path[i]
-            right = curr_path[i+1]
+            left = coordinates[curr_path[i]]
+            right = coordinates[curr_path[i+1]]
             curr_solution += math.dist(left, right)
             if curr_solution >= best_solution:
                 pruned = True
@@ -79,8 +84,7 @@ def prune_search(coordinates: list):
             print(f"\t\t{curr_solution}m found at {round(end - start, 2)}s")
             best_solution = curr_solution
             best_path = curr_path.copy()
-        pruned = False
-
+        
     return best_solution, best_path
 
 def NN_prune_search(coordinates: list):
@@ -171,8 +175,8 @@ if __name__=="__main__":
     solution_filename = "test_solutions/" + os.path.basename(filename) + "_solution_" + str(best_solution) + ".txt"
 
     with open(solution_filename, 'w') as f:
-        for x,y in best_path:
-            f.write(str(x) + " " + str(y) + "\n")
+        for index in best_path:
+            f.write(str(index) + "\n")
 
     print(f"Route written to disk as test_solutions/{os.path.basename(filename)}_solution_{best_solution}.txt")
     
