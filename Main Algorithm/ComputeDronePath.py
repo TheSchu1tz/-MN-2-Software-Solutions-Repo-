@@ -3,6 +3,7 @@ import math
 import random
 import keyboard
 import os
+import matplotlib.pyplot as plt
 
 def main():
     filepath = input("Enter the name of the file: ")
@@ -32,7 +33,7 @@ def main():
     while True:
         # handle ENTER press, anytime algorithm exits
         if (keyboard.is_pressed('\n')):
-            outputPath = WriteSolution(filepath, bestCost, bestOrder)
+            outputPath = WriteSolution(filepath, bestCost, bestOrder, coords)
             print("Route written to disk as", outputPath)
             break
         # check if theres a better solution otherwise
@@ -66,23 +67,23 @@ def ParseFile(lines):
 
 # Create distance matrix using Euclidean Distance from coordinates
 def CreateDistanceMatrix(coords):
-    distMatrix = numpy.empty((len(coords)+1, len(coords)+1))
+    distMatrix = numpy.empty((len(coords), len(coords)))
     for x, coord1 in enumerate(coords):
         for y, coord2 in enumerate(coords):
             distance = EuclideanDistance(coord1, coord2)
-            distMatrix[x+1,y+1] = distance
+            distMatrix[x,y] = distance
     return distMatrix
 
 # creates a random ordering of the coordinates
 def CreateRandomOrder(coords):
     indices = []
     for i in range(len(coords)):
-        indices.append(i + 1)
-    indices.remove(1)   # remove the recharge point
+        indices.append(i)
+    indices.remove(0)   # remove the recharge point
     random.shuffle(indices)
-    # guarantees 1 to be at the beginning and end
-    indices.insert(0, 1)
-    indices.append(1)
+    # guarantees landing pad to be at the beginning and end
+    indices.insert(0, 0)
+    indices.append(0)
     return indices
 
 # computes the cost of a particular order using distance matrix
@@ -100,12 +101,36 @@ def EuclideanDistance(coord1, coord2):
 
 # writes the order with the best cost to file according to the 
 # output specifications 
-def WriteSolution(filepath, bestCost, bestOrder):
+def WriteSolution(filepath, bestCost, bestOrder, coordinates):
     splitFile = os.path.splitext(filepath)
     outputPath = splitFile[0] + "_solution_" + str(int(bestCost)) + ".txt"
+    
+    # create the txt file output
     outputFile = open(outputPath, "w")
-    outputFile.write(f"{bestOrder}")
+    outputStr = ""  
+    for index in bestOrder:
+        outputStr += str(index + 1) + " "
+    outputFile.write(f"{outputStr}")
     outputFile.close()
+
+    # create the png output
+    plt.figure(figsize=(19.20, 10.80), dpi=100)
+    plt.axis('off')
+    
+    landingX = 0
+    landingY = 0
+    x = []
+    y = []
+    for i in bestOrder:
+        x.append(coordinates[i][0])
+        y.append(coordinates[i][1])
+        if i == 0:
+            landingX = coordinates[i][0]
+            landingY = coordinates[i][1]
+    plt.plot(x, y, color='blue', linewidth=2, marker='o', markersize=10)
+    plt.plot(landingX, landingY, color='red', marker='o', markersize=16)
+    plt.savefig(splitFile[0] + "_solution_" + str(int(bestCost)) + ".png")
+
     return outputPath
 
 if __name__ == "__main__":
