@@ -20,31 +20,45 @@ def main():
     distMatrix = CreateDistanceMatrix(coords)
 
     # create random order of coordinates to visit
-    indices = CreateRandomOrder(coords)
+    # algType = algorithm to be run (1 = random, 2 = random prune, 3 = NN)
+    algType = 3
 
-    # set up variables to track best solution
-    bestCost = ComputeCost(indices, distMatrix)
+    if algType == 1:
+        indices = CreateRandomOrder(coords)
+        bestCost = ComputeCost(indices, distMatrix)
+        
+    if algType == 2:
+        bestCost, indices = prune_search(coords)
+
+    if algType == 3:
+        bestCost, indices = NN_random_search(coords)
+
+    # set up variable to track best solution
     bestOrder = indices
 
+    if algType == 1:
     # output intro text
-    print("There are", len(coords), "nodes, computing route..")
-    print("\tShortest Route Discovered So Far")
-    print("\t\t", bestCost)
+        print("There are", len(coords), "nodes, computing route..")
+        print("\tShortest Route Discovered So Far")
+        print("\t\t", bestCost)
 
-    # begin the main loop, looking for better answers
-    while True:
-        # handle ENTER press, anytime algorithm exits
-        if (keyboard.is_pressed('\n')):
-            outputPath = WriteSolution(filepath, bestCost, bestOrder, coords)
-            print("Route written to disk as", outputPath)
-            break
-        # check if theres a better solution otherwise
-        newOrder = CreateRandomOrder(coords)
-        cost = ComputeCost(newOrder, distMatrix)
-        if (cost < bestCost):
-            bestCost = cost
-            bestOrder = newOrder
-            print("\t\t", bestCost)
+        # begin the main loop, looking for better answers
+        while True:
+            # handle ENTER press, anytime algorithm exits
+            if (keyboard.is_pressed('\n')):
+                outputPath = WriteSolution(filepath, bestCost, bestOrder, coords)
+                print("Route written to disk as", outputPath)
+                break
+            # check if theres a better solution otherwise
+            newOrder = CreateRandomOrder(coords)
+            cost = ComputeCost(newOrder, distMatrix)
+            if (cost < bestCost):
+                bestCost = cost
+                bestOrder = newOrder
+                print("\t\t", bestCost)
+    else:
+        outputPath = WriteSolution(filepath, bestCost, bestOrder, coords)
+        print("Route written to disk as", outputPath)
 
 # returns array of strings read from filename
 def ReadFile(filename):
@@ -171,7 +185,9 @@ def prune_search(coordinates: list):
     start = time.time() #MO: This is to time the search
 
     threading.Thread(target=wait_for_key, daemon=True).start()
-    
+
+    print("There are", len(coordinates), "nodes, computing route..")
+    print("\tShortest Route Discovered So Far")
     while(not stop):
         curr_solution = 0.0
         trees_coords = coord_indexes[1:].copy()
@@ -189,7 +205,7 @@ def prune_search(coordinates: list):
         
         if curr_solution < best_solution and not pruned:
             end = time.time()
-            print(f"\t\t{curr_solution}m found at {round(end - start, 2)}s")
+            print(f"\t\t{round(curr_solution, 1)}") #m found at {round(end - start, 2)}s
             best_solution = curr_solution
             best_path = curr_path.copy()
         
@@ -262,16 +278,18 @@ def NN_random_search(coordinates: list):
     best_solution = nn_solution 
 
     end = time.time()
-    print(f"\t\t{best_solution}m found at {round(end - start, 2)}s")
 
     random_path = []
     random_solution = float('inf')
+    print("There are", len(coordinates), "nodes, computing route..")
+    print("\tShortest Route Discovered So Far")
+    print(f"\t\t{round(nn_solution, 1)}")
     while (not stop):
         coord_indexes = [i for i in range(len(coordinates))]
         random_path, random_solution = compute_NN(coord_indexes, coordinates, True)
         if random_solution <= best_solution:
             end = time.time()
-            print(f"\t\t{random_solution}m found at {round(end - start, 2)}s")
+            print(f"\t\t{round(random_solution, 1)}")#m found at {round(end - start, 2)}s
             best_solution = random_solution
             best_path = random_path
 
