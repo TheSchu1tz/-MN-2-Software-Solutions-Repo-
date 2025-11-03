@@ -140,7 +140,7 @@ def WriteSolution(filepath, bestCost, bestOrder, coordinates):
     # create the png output
     plt.figure(figsize=(19.20, 19.20), dpi=100)
     plt.rcParams.update({'font.size': 22})
-    plt.title(f"Best Route Found (Distance = {bestCost} units)", fontsize=32)
+    plt.title(f"Best Route Found (Distance = {int(bestCost)} units)", fontsize=32)
     plt.xlabel('X', fontsize=24)
     plt.ylabel('Y', fontsize=24)
     ax = plt.gca()
