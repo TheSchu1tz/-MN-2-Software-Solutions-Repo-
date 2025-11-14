@@ -1,5 +1,7 @@
 import math
 import random
+import os
+import matplotlib.pyplot as plt
 from collections import defaultdict
 
 
@@ -72,6 +74,67 @@ def KMeans_Classify(all_coordinates: list, num_centers: int):
         i += 1
     return
 
+# writes the order with the best cost to file according to the 
+# output specifications 
+def WriteSolution(filepath, bestCost, bestOrder):
+    splitFile = os.path.splitext(filepath)
+    outputPath = splitFile[0] + "_solution_" + str(int(bestCost)) + ".txt"
+    
+    # create the txt file output
+    outputFile = open(outputPath, "w")
+    outputStr = ""  
+    for index in bestOrder:
+        outputStr += str(index + 1) + " "
+    outputFile.write(f"{outputStr}")
+    outputFile.close()
+
+    return outputPath
+
+# Draws and saves a graph of the solutions to disk
+def DrawGraph(file, solutions):
+    # set up the plot
+    plt.figure(figsize=(19.20, 19.20), dpi=100)
+    plt.rcParams.update({'font.size': 22})
+    plt.title(f"Best Routes Found Per Cluster", fontsize=32)
+    plt.xlabel('X-Axis (Meters)', fontsize=24)
+    plt.ylabel('Y-Axis (Meters)', fontsize=24)
+    ax = plt.gca()
+    ax.set_aspect('equal', adjustable='box')
+    plt.draw()
+
+    # graph each route
+    colors = ["#D81B60", "#1E88E5", "#FFC107", "#004D40"]
+    for i, sol in enumerate(solutions):
+        coordinates = sol[0]
+        center = sol[1]
+        bestOrder = sol[2]
+        x = []
+        y = []
+        for j in bestOrder:
+            x.append(coordinates[j][0])
+            y.append(coordinates[j][1])
+        plt.plot(x, y, color=colors[i], linewidth=2, marker='o', markersize=10)
+        plt.plot(center[0], center[1], color=colors[i], marker='*', markersize=30)
+    
+    plt.tight_layout()
+    plt.grid()
+    plt.savefig(file + "_OVERALL_SOLUTION.png", dpi=100)
+
+# produces a simple test graph
+def TestDrawGraph():
+    coord1 = [(100,100), (300,100), (100,300)]
+    center1 = (150,150)
+    bestOrder1 = (0,1,2,0)
+    sol1 = [coord1, center1, bestOrder1]
+
+    coord2 = [(-600,-200), (-350,-130), (-400,-500)]
+    center2 = (-440,-300)
+    bestOrder2 = (0,1,2,0)
+    sol2 = [coord2, center2, bestOrder2]
+
+    solutions = [sol1, sol2]
+    DrawGraph("test", solutions)
+
 #TODO: Use finalized centers and assignments to run the search algorithm to compute paths.
 
 if __name__== "__main__":
@@ -100,3 +163,5 @@ if __name__== "__main__":
     # test_nodes = [i for i in range(15)]
     # for i in range(1,5):
     #     assign_num_nodes(len(test_nodes), i)
+
+    # TestDrawGraph()
