@@ -105,6 +105,9 @@ def WriteSolution(filepath, solutions):
         outputFile.write(outputStr.strip())
         outputFile.close()
 
+    output_png_path = DrawGraph(filepath, solutions)
+    output_paths.append(output_png_path)
+
     output_string = "Writing " + ", ".join(output_paths) + " to disk"
     print(output_string)
 
@@ -251,7 +254,6 @@ def recalculate_clusters(all_coordinates: list, cluster_assignments: list, num_c
     
     return new_centers
 
-
 #MO: Driver function that runs K means algorithm and returns the sets of assignments to run a search on
 #TODO: Finish this function
 def KMeans_Classify(all_coordinates: list, num_centers: int):
@@ -278,28 +280,17 @@ def KMeans_Classify(all_coordinates: list, num_centers: int):
 
     return cluster_centers, cluster_data
 
-# writes the order with the best cost to file according to the 
-# output specifications 
-def WriteSolution(filepath, bestCost, bestOrder):
+def DrawGraph(filepath, solutions):
     splitFile = os.path.splitext(filepath)
-    outputPath = splitFile[0] + "_solution_" + str(int(bestCost)) + ".txt"
-    
-    # create the txt file output
-    outputFile = open(outputPath, "w")
-    outputStr = ""  
-    for index in bestOrder:
-        outputStr += str(index + 1) + " "
-    outputFile.write(f"{outputStr}")
-    outputFile.close()
+    file_base = splitFile[0]
 
-    return outputPath
-
-# Draws and saves a graph of the solutions to disk
-def DrawGraph(file, solutions):
     # set up the plot
     plt.figure(figsize=(19.20, 19.20), dpi=100)
     plt.rcParams.update({'font.size': 22})
-    plt.title(f"Best Routes Found Per Cluster", fontsize=32)
+
+    num_drones = len(solutions)
+    total_cost = sum(s["route_length"] for s in solutions)
+    plt.title(f"Best Routes ({num_drones} Drones, Total Dist: {total_cost:.1f}m)", fontsize=32)
     plt.xlabel('X-Axis (Meters)', fontsize=24)
     plt.ylabel('Y-Axis (Meters)', fontsize=24)
     ax = plt.gca()
@@ -309,69 +300,22 @@ def DrawGraph(file, solutions):
     # graph each route
     colors = ["#D81B60", "#1E88E5", "#FFC107", "#004D40"]
     for i, sol in enumerate(solutions):
-        coordinates = sol[0]
-        center = sol[1]
-        bestOrder = sol[2]
-        x = []
-        y = []
-        for j in bestOrder:
-            x.append(coordinates[j][0])
-            y.append(coordinates[j][1])
-        plt.plot(x, y, color=colors[i], linewidth=2, marker='o', markersize=10)
-        plt.plot(center[0], center[1], color=colors[i], marker='*', markersize=30)
+        full_path = sol["full_path"]
+        landing_coord = sol["landing_coord"]
+        x = [coord[0] for coord in full_path]
+        y = [coord[1] for coord in full_path]
+
+        plt.plot(x, y, color=colors[i % len(colors)], linewidth=2, marker='o', markersize=10, label=f"Drone {sol['drone_num']} Path ({sol['route_length']:.1f}m)")
+        plt.plot(landing_coord[0], landing_coord[1], color=colors[i % len(colors)], marker='*', markersize=30, label=f"LP {sol['drone_num']}")
     
+    plt.legend()
     plt.tight_layout()
     plt.grid()
-    plt.savefig(file + "_OVERALL_SOLUTION.png", dpi=100)
 
-# produces a simple test graph
-def TestDrawGraph():
-    coord1 = [(100,100), (300,100), (100,300)]
-    center1 = (150,150)
-    bestOrder1 = (0,1,2,0)
-    sol1 = [coord1, center1, bestOrder1]
+    output_filename = f"{file_base}_OVERALL_SOLUTION_{num_drones}D.png"
+    plt.savefig(output_filename, dpi=100)
 
-    coord2 = [(-600,-200), (-350,-130), (-400,-500)]
-    center2 = (-440,-300)
-    bestOrder2 = (0,1,2,0)
-    sol2 = [coord2, center2, bestOrder2]
-
-    solutions = [sol1, sol2]
-    DrawGraph("test", solutions)
-
-#TODO: Use finalized centers and assignments to run the search algorithm to compute paths.
+    return output_filename
 
 if __name__== "__main__":
     main()
-    # filepath = input("Enter the name of the file: ")
-    # filename = r"C:\Users\noahj\CS 179M\-MN-2-Software-Solutions-Repo-P1\test\Walnut2621.txt"
-    # # read the file
-    # coords = []
-
-    # with open(filename, 'r') as file:
-    #     for line in file:
-    #         x, y = map(float, line.split())
-    #         coords.append((x,y))
-    #TESTS
-    # num_centers = 1
-    # cluster_centers = [(random.uniform(-10, 10), random.uniform(-10, 10)) for _ in range(num_centers)] 
-    # print(f"1 Cluster - ")
-    # KMeans_Classify(coords, num_centers)
-    # num_centers = 2
-    # cluster_centers = [(random.uniform(-10, 10), random.uniform(-10, 10)) for _ in range(num_centers)] 
-    # print(f"2 Clusters - ")
-    # KMeans_Classify(coords, num_centers)
-    # num_centers = 3
-    # cluster_centers = [(random.uniform(-10, 10), random.uniform(-10, 10)) for _ in range(num_centers)] 
-    # print(f"3 Clusters - ")
-    # KMeans_Classify(coords, num_centers)
-    # num_centers = 4
-    # cluster_centers = [(random.uniform(-10, 10), random.uniform(-10, 10)) for _ in range(num_centers)] 
-    # print(f"4 Clusters - ")
-    # KMeans_Classify(coords, num_centers)
-
-    # test_nodes = [i for i in range(15)]
-    # for i in range(1,5):
-    #     assign_num_nodes(len(test_nodes), i)
-
-    # TestDrawGraph()
