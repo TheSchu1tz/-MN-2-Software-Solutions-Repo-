@@ -194,7 +194,7 @@ def cluster_NN_random_search(cluster_coords:list, center_coord:list):
     best_path, best_solution = compute_cluster_NN(cluster_coords, center_coord, False)
 
     iterations = 0
-    while (iterations < 100): #NS: Runs through multiple iterations, no longer anytime algorithm
+    while (iterations < 150): #NS: Runs through multiple iterations, no longer anytime algorithm
         random_path, random_solution = compute_cluster_NN(cluster_coords, center_coord, True)
         if random_solution <= best_solution:
             best_solution = random_solution
@@ -262,11 +262,11 @@ def KMeans_Classify(all_coordinates: list, num_centers: int):
     #Classify nodes by distance to center
     prev_clusters = cluster_centers
     i = 0
-    while(i < 100): 
+    while(i < 150): 
         #Reestimate centers
         cluster_assignments = classify_nodes(cluster_centers, all_coordinates)
         cluster_centers = recalculate_clusters(all_coordinates, cluster_assignments, num_centers)
-        #NS: Keep going until centers stop changing or ran too long (100 iterations, need to stop for time constraints)
+        #NS: Keep going until centers stop changing or ran too long (150 iterations, need to stop for time constraints)
         if (cluster_centers == prev_clusters):
             break
         prev_clusters = cluster_centers
