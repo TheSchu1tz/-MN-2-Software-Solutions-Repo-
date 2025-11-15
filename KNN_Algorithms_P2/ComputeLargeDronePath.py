@@ -125,13 +125,15 @@ def ReadFile(filename):
 def ParseFile(lines):
     coords_with_index = []
     for i, line in enumerate(lines):
-        numbers = line.split("   ")
-        while '' in numbers:
-            numbers.remove('')
-        x = float(numbers[0].strip())
-        y = float(numbers[1].strip())
-        coord = [x, y]
-        coords_with_index.append((coord, i))
+        numbers = line.split()
+        if len(numbers) >= 2:
+            x = float(numbers[0].strip())
+            y = float(numbers[1].strip())
+            coord = [x, y]
+            coords_with_index.append((coord, i))
+        else:
+            print(f"Skipping line {i+1}: Not enough coordinates found.")
+            
     return coords_with_index
 
 # computes the Euclidean distance between 2 coordinates
