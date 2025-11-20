@@ -88,7 +88,7 @@ def ParseFile(lines):
         # get the id "{00000}"
         weight = int(parts[1].strip("{}"))
         # get the item "NAN"
-        item = parts[2].strip("\n")
+        item = parts[2].strip()
 
         container = Container(coord, weight, item)
         manifest.append(container)

@@ -1,1 +1,47 @@
 #:kivy 2.3.1
+<ShipScreen>:
+    name: "ship_screen"
+
+    BoxLayout:
+        orientation: "vertical"
+
+        # Top header bar
+        BoxLayout:
+            size_hint_y: None     # give a fixed height
+            height: dp(80)
+            padding: dp(10)
+            spacing: dp(10)
+
+            Label:
+                text: "Ship Screen"
+                font_size: 32
+                color: 1, 1, 1, 1
+                size_hint_x: 0.7   # keep on left
+
+            Button:
+                text: "Go back"
+                on_press: root.manager.current = "input_screen"
+                size_hint_x: 0.3   # limit width
+                size_hint_y: 1     # fill only vertically inside header
+
+        # The grid area
+        GridLayout:
+            id: grid
+            size_hint: 1, 1        # fill the rest
+            spacing: 2
+            padding: 2
+
+
+<ContainerBox>:
+    size_hint: None, None
+
+    canvas.before:
+        Color:
+            rgba: self.bg_color
+        Rectangle:
+            pos: self.pos
+            size: self.size 
+    Label: 
+        color: root.weight_color
+        text: str(root.weight)
+        center: root.center
