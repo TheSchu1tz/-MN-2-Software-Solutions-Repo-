@@ -9,25 +9,26 @@ UNUSED = "UNUSED"
 NAN = "NAN"
 
 def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
-    # TODO: create a copy of the grid aka node
+    # create a copy of the grid aka node
+    new_grid = grid.copy()
     
     # find the highest empty space in the new column
     for i in range(GRID_ROWS):
-        check:Container = grid[i][newColumn]
+        check:Container = new_grid[i][newColumn]
         if check.item == UNUSED:
             emptySpace = check
             break
 
     # calculate cost of swap
-    costSwap = CostSwap(grid, container.coord.col, newColumn)
+    costSwap = CostSwap(new_grid, container.coord.col, newColumn)
 
     # swap empty and containers positions above it
     emptyCoord = emptySpace.coord
     currCoord = container.coord
-    grid[currCoord.row][currCoord.col] = emptySpace
-    grid[emptyCoord.row][emptyCoord.col] = container
+    new_grid[currCoord.row][currCoord.col] = emptySpace
+    new_grid[emptyCoord.row][emptyCoord.col] = container
 
-    return costSwap
+    return costSwap, new_grid
 
 # returns the amount the crane needs to move to get from col1 to col2
 def CostSwap(grid, col1, col2):
@@ -83,6 +84,7 @@ def ParseFile(lines):
         # get plain text [01, 01], {00000}, NAN
         parts = line.split(", ")
         # get int representation of the coordinate [1,1]
+        print(parts)
         x, y = parts[0].strip("[]").split(",")
         coord = Coordinate(int(x) - 1, int(y) - 1)
         # get the id "{00000}"
