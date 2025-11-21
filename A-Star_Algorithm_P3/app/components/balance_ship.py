@@ -82,7 +82,12 @@ def CheckBalance(grid:numpy.ndarray):
     # Case 2: difference is minimal
     # determine minimal difference
 
-    
+    # Change, final if-else statement for whether ship balanced or not
+    if (1):
+        return True
+    else:
+        return False
+
 
 
 def CreateGrid(manifest):
