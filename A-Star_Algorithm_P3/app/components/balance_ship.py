@@ -44,23 +44,46 @@ def Height(grid:numpy.ndarray, column):
     return height
 
 def CheckBalance(grid:numpy.ndarray):
+    # Get Weights
+    left_weights = []
+    right_weights = []
+    mid_col = GRID_COLS / 2
+
+    for x in range(GRID_ROWS):
+        for y in range(GRID_COLS):
+            container:Container = grid[x][y]
+            if container.item != UNUSED and container.item != NAN:
+                if x < mid_col:
+                    left_weights.append(container.weight)
+                else:
+                    right_weights.append(container.weight)
+
+    all_weights = left_weights + right_weights
+    
+    # Special Case 1 & 2: 0 or 1 containers only
+    if len(all_weights) <= 1:
+        return True
+    
+    # Special Case 3: 2 containers, 1 each side
+    if len(left_weights) == 1 and len(right_weights) == 1:
+        return True
+    
     # Case 1: difference less than limit
     # sum the left and right halves
-    sumLeft = 0
-    sumRight = 0
-    for i in range(GRID_ROWS):
-        for j in range(GRID_COLS / 2):
-            leftItem:Container = grid[i][j]
-            rightItem:Container = grid[i][GRID_COLS / 2 + j]
-            sumLeft += leftItem.weight
-            sumRight += rightItem.weight
-
+    sumLeft = sum(left_weights)
+    sumRight = sum(right_weights)
+    total = sumLeft + sumRight
     difference = abs(sumLeft - sumRight)
-    limit = sumLeft + sumRight * 0.10
+    limit = total * 0.10
 
-    return difference < limit or difference == 0
+    if (difference < limit):
+        return True
 
-    # TODO: Case 2: difference is minimal
+    # Case 2: difference is minimal
+    # determine minimal difference
+
+    
+
 
 def CreateGrid(manifest):
     grid = numpy.zeros((GRID_ROWS, GRID_COLS), dtype=Container)
