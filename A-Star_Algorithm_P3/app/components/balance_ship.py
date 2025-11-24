@@ -1,4 +1,5 @@
 import numpy
+import copy
 from components.data_types.coordinate import Coordinate
 from components.data_types.container import Container
 
@@ -9,6 +10,15 @@ UNUSED = "UNUSED"
 NAN = "NAN"
 
 def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
+
+    # First check if the container is movable/ has another container above it
+    curr_row = container.coord.row
+    curr_col = container.coord.col
+
+    for x in range(curr_row + 1, GRID_ROWS):
+        if grid[x][curr_col].item != UNUSED:
+            return float('inf'), grid # Cannot move this container so cost is infinite
+        
     # create a copy of the grid aka node
     new_grid = grid.copy()
     
@@ -17,18 +27,32 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
     for i in range(GRID_ROWS):
         check:Container = new_grid[i][newColumn]
         if check.item == UNUSED:
-            emptySpace = check
+            # emptySpace = check
             new_row = i
             break
 
     # calculate cost of swap
-    costSwap = CostSwap(new_grid, container.coord, Coordinate(new_row, newColumn))
+    target_coord = Coordinate(new_row, newColumn)
+    costSwap = CostSwap(new_grid, container.coord, target_coord)
+
+    # save the old coordinates and copy the actual objects over to the grid
+    old_row, old_col = container.coord.row, container.coord.col
+    source_container = new_grid[old_row][old_col]
+    destination_container = new_grid[new_row][newColumn]
+
+    new_source_container = copy.deepcopy(source_container)
+    new_destination_container = copy.deepcopy(destination_container)
+
+    new_source_container.coord = Coordinate(new_row, newColumn)
+    new_destination_container.coord = Coordinate(old_row, old_col)
 
     # swap empty and containers positions above it
-    emptyCoord = emptySpace.coord
-    currCoord = container.coord
-    new_grid[currCoord.row][currCoord.col] = emptySpace
-    new_grid[emptyCoord.row][emptyCoord.col] = container
+    new_grid[new_row][newColumn] = new_source_container
+    new_grid[old_row][old_col] = new_destination_container
+    # emptyCoord = emptySpace.coord
+    # currCoord = container.coord
+    # new_grid[currCoord.row][currCoord.col] = emptySpace
+    # new_grid[emptyCoord.row][emptyCoord.col] = container
 
     return costSwap, new_grid
 

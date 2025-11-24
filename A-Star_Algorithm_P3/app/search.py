@@ -1,4 +1,6 @@
 import numpy as np
+import os
+from pathlib import Path
 import itertools
 import components.balance_ship as bs
 from queue import PriorityQueue
@@ -15,8 +17,8 @@ class Node:
         self.parent = parent
         self.depth = depth
         self.cost = cost
-        self.g_func = g_func
-        self.h_func = calculate_heuristic(self.state)
+        self.g_func = g_func # Accumulating cost of doing this move
+        self.h_func = calculate_heuristic(self.state) # Heuristic value of this state
         self.f_func = self.g_func + self.h_func
 
     def __lt__(self, other):
@@ -89,8 +91,9 @@ def calculate_heuristic(state:np.ndarray):
     for column in heavy_cols:
         for row in range(bs.GRID_ROWS -1, -1, -1):
             container = state[row][column]
-            if  container.item != bs.UNUSED and container.item != bs.NAN: # Found a movable container
-                from_columns.append(column)
+            if  container.item != bs.UNUSED: 
+                if container.item != bs.NAN:
+                    from_columns.append(column) # Found a movable container
                 break
     
     # Search for all possible columns on light side
@@ -127,6 +130,7 @@ def run_search(starting_grid: np.ndarray):
             print(f"DEBUG: SHIP BALANCED. g = {curr_node.g_func}, h = {curr_node.h_func}")
             return curr_node.state
         
+        # Make sure we don't search the same state twice
         state_id = curr_node.map_string()
         if state_id in visited:
             continue
@@ -141,16 +145,35 @@ def run_search(starting_grid: np.ndarray):
     # This is an error condition
     return None
 
+
+# This is for testing, comment this out when running the actual program
 if __name__=="__main__":
 
-    input_file = "test_manifests/ShipCase3.txt"
+    input_files = [
+        "test_manifests/ShipCase1.txt",
+        "test_manifests/ShipCase2.txt",
+        "test_manifests/ShipCase3.txt",
+        "test_manifests/ShipCase4.txt",
+        "test_manifests/ShipCase5.txt",
+        "test_manifests/ShipCase6.txt"
+    ]
 
-    file_lines = bs.ReadFile(input_file)
+    for file in input_files:
 
-    manifest = bs.ParseFile(file_lines)
+        file_lines = bs.ReadFile(file)
 
-    starting_grid = bs.CreateGrid(manifest)
+        manifest = bs.ParseFile(file_lines)
 
-    final_grid = run_search(starting_grid)
+        starting_grid = bs.CreateGrid(manifest)
 
+        final_grid = run_search(starting_grid)
+
+        p = Path(file)
+
+        out_dir = Path("test_solutions")
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        with open(out_dir / (p.stem + "_SOLUTION.txt"), "x") as new_file:
+            for container in final_grid.flat:
+                new_file.write(f"[0{container.coord.row + 1},{container.coord.col + 1}], {{{container.weight}}}, {container.item}\n")
     
