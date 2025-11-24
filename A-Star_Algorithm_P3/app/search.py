@@ -120,14 +120,14 @@ def run_search(starting_grid: np.ndarray):
 
     init_state = Node(starting_grid) # Convert the grid to a Node type
     
-    print(f"DEBUG: STARTING WITH INITIAL H VALUE OF {init_state.h_func}")
+    # print(f"DEBUG: STARTING WITH INITIAL H VALUE OF {init_state.h_func}")
     q.put((init_state.f_func, next(tie_breaker), init_state)) # Add initial state to the queue with heuristic function
 
     while(q): # Start searching by popping elements off the queue
         _, _, curr_node = q.get()
 
         if bs.CheckBalance(curr_node.state):
-            print(f"DEBUG: SHIP BALANCED. g = {curr_node.g_func}, h = {curr_node.h_func}")
+            # print(f"DEBUG: SHIP BALANCED. g = {curr_node.g_func}, h = {curr_node.h_func}")
             return curr_node.state
         
         # Make sure we don't search the same state twice
