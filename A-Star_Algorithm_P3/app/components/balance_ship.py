@@ -68,27 +68,42 @@ def CheckBalance(grid:numpy.ndarray):
     if len(left_weights) == 1 and len(right_weights) == 1:
         return True
     
-    # Case 1: difference less than limit
-    # sum the left and right halves
+    #Calculate sum of left/right weights
     sumLeft = sum(left_weights)
     sumRight = sum(right_weights)
+    
+    # Balance Case 1: difference less than 10% limit
+    if TenPercentBalanceHelper(sumLeft, sumRight):
+        return True
+
+    # Balance Case 2: difference is minimal
+    if MinDiffBalanceHelper(sumLeft, sumRight, all_weights):
+        return True
+
+    # If neither, return false
+    return False
+
+# CheckBalance helper for first balanced case
+def TenPercentBalanceHelper(sumLeft: int, sumRight: int):
     total = sumLeft + sumRight
     difference = abs(sumLeft - sumRight)
     limit = total * 0.10
+    return difference <= limit
 
-    if (difference < limit):
-        return True
+# CheckBalance helper for second balanced case
+def MinDiffBalanceHelper(sumLeft: int, sumRight: int, all_weights: int):
+    difference = abs(sumLeft - sumRight)
+    total_weight = sum(all_weights)
+    target = total_weight / 2
 
-    # Case 2: difference is minimal
-    # determine minimal difference
+    possible_sums = {0}
 
-    # Change, final if-else statement for whether ship balanced or not
-    if (1):
-        return True
-    else:
-        return False
+    for weight in all_weights:
+        possible_sums |= {sum + weight for sum in possible_sums}
 
-
+    best_half_sum = max(sum for sum in possible_sums if sum <= target)
+    possible_min_diff = total_weight - best_half_sum - best_half_sum
+    return difference == possible_min_diff
 
 def CreateGrid(manifest):
     grid = numpy.zeros((GRID_ROWS, GRID_COLS), dtype=Container)
