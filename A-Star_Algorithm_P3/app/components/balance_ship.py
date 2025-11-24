@@ -1,6 +1,6 @@
 import numpy
-from data_types.coordinate import Coordinate
-from data_types.container import Container
+from components.data_types.coordinate import Coordinate
+from components.data_types.container import Container
 
 GRID_ROWS = 8
 GRID_COLS = 12
