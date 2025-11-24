@@ -1,6 +1,7 @@
 import numpy as np
 import components.balance_ship as bs
 from queue import PriorityQueue
+from components.data_types.container import Container
 
 # Node class represents a state in the puzzle and represents the state as a list
 class Node:
@@ -29,26 +30,51 @@ class Node:
         for container in movable_containers:
             for column in range(bs.GRID_COLS):
                 cost, new_state = bs.MoveToColumn(self.state, self.state[container[0]][container[1]], column)
-                expanded_nodes.append((cost, Node(new_state, self.state, self.depth + 1, cost)))
+                new_heur = calculate_heuristic(new_state)# Calculate heuristic for new state
+                expanded_nodes.append((new_heur, Node(new_state, self.state, self.depth + 1, cost)))
+        
+        return expanded_nodes
 
                     
             
+# Using modified CheckBalance function to calculate the heuristic
+def calculate_heuristic(state:np.ndarray):
+    sumLeft = 0
+    sumRight = 0
+    for i in range(bs.GRID_ROWS):
+        for j in range(bs.GRID_COLS // 2):
+            leftItem:Container = state[i][j]
+            rightItem:Container = state[i][bs.GRID_COLS // 2 + j]
+            sumLeft += leftItem.weight
+            sumRight += rightItem.weight
+
+    difference = abs(sumLeft - sumRight)
+    
+    return difference
 
 # Run the A* search algorithm on a given grid
 def run_search(starting_grid: np.ndarray):
 
     q = PriorityQueue()
+    visited = set()
     init_state = Node(starting_grid) # Convert the grid to a Node type
-    q.put((0, init_state)) # Add initial state to the queue with cost 0
+    init_heur = calculate_heuristic(init_state.state)
+    q.put((init_heur, init_state)) # Add initial state to the queue with heuristic function
 
     while(q): # Start searching by popping elements off the queue
-        curr_node = q.get()
+        _, curr_node = q.get()
+        visited.add(curr_node)
+
         if bs.CheckBalance(curr_node.state):
             return curr_node.state
+        
         expanded_nodes = curr_node.expand()
-        for cost, node in expanded_nodes:
-            q.put((cost, node))
+        
+        for heur, node in expanded_nodes:
+            if node not in visited:
+                q.put((heur, node))
 
+    # This is an error condition
     return None
 
 if __name__=="__main__":
@@ -60,5 +86,7 @@ if __name__=="__main__":
     manifest = bs.ParseFile(file_lines)
 
     starting_grid = bs.CreateGrid(manifest)
+
+    final_grid = run_search(starting_grid)
 
     

@@ -13,14 +13,16 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
     new_grid = grid.copy()
     
     # find the highest empty space in the new column
+    new_row = None
     for i in range(GRID_ROWS):
         check:Container = new_grid[i][newColumn]
         if check.item == UNUSED:
             emptySpace = check
+            new_row = i
             break
 
     # calculate cost of swap
-    costSwap = CostSwap(new_grid, container.coord.col, newColumn)
+    costSwap = CostSwap(new_grid, container.coord, Coordinate(new_row, newColumn))
 
     # swap empty and containers positions above it
     emptyCoord = emptySpace.coord
@@ -31,8 +33,8 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
     return costSwap, new_grid
 
 # returns the amount the crane needs to move to get from col1 to col2
-def CostSwap(grid, col1, col2):
-    raise NotImplementedError("need to implement this!")
+def CostSwap(grid, coord1, coord2):
+    return abs(coord1.row - coord2.row) + abs(coord1.col - coord2.col)
 
 def Height(grid:numpy.ndarray, column):
     height = 0
@@ -50,9 +52,9 @@ def CheckBalance(grid:numpy.ndarray):
     sumLeft = 0
     sumRight = 0
     for i in range(GRID_ROWS):
-        for j in range(GRID_COLS / 2):
+        for j in range(GRID_COLS // 2):
             leftItem:Container = grid[i][j]
-            rightItem:Container = grid[i][GRID_COLS / 2 + j]
+            rightItem:Container = grid[i][GRID_COLS // 2 + j]
             sumLeft += leftItem.weight
             sumRight += rightItem.weight
 

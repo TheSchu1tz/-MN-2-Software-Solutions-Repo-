@@ -67,7 +67,8 @@ def main():
         for i, soln in enumerate(solutions):
             prefix = prefixes[i]
             landing_pad = soln["landing_coord"]
-            print(f"\t{prefix}. Landing Pad {i+1} should be at [{landing_pad[0]}, {landing_pad[1]}], serving {soln["num_nodes"]} locations, route is {soln["route_length"]} meters")
+            print(f'\t{prefix}. Landing Pad {i+1} should be at [{landing_pad[0]}, {landing_pad[1]}], serving {soln["num_nodes"]} locations, route is {soln["route_length"]} meters')
+
 
     # drone count decision
     drone_choice = 0
