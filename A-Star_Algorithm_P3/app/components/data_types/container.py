@@ -1,4 +1,4 @@
-from data_types.coordinate import Coordinate
+from components.data_types.coordinate import Coordinate
 
 class Container:
     def __init__(self, coord:Coordinate, weight:int, item:str):

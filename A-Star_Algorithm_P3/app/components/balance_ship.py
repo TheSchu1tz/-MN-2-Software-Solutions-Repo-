@@ -1,6 +1,7 @@
 import numpy
-from data_types.coordinate import Coordinate
-from data_types.container import Container
+import copy
+from components.data_types.coordinate import Coordinate
+from components.data_types.container import Container
 
 GRID_ROWS = 8
 GRID_COLS = 12
@@ -9,29 +10,55 @@ UNUSED = "UNUSED"
 NAN = "NAN"
 
 def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
-    # TODO: create a copy of the grid aka node
+
+    # First check if the container is movable/ has another container above it
+    curr_row = container.coord.row
+    curr_col = container.coord.col
+
+    for x in range(curr_row + 1, GRID_ROWS):
+        if grid[x][curr_col].item != UNUSED:
+            return float('inf'), grid # Cannot move this container so cost is infinite
+        
+    # create a copy of the grid aka node
+    new_grid = grid.copy()
     
     # find the highest empty space in the new column
+    new_row = None
     for i in range(GRID_ROWS):
-        check:Container = grid[i][newColumn]
+        check:Container = new_grid[i][newColumn]
         if check.item == UNUSED:
-            emptySpace = check
+            # emptySpace = check
+            new_row = i
             break
 
     # calculate cost of swap
-    costSwap = CostSwap(grid, container.coord.col, newColumn)
+    target_coord = Coordinate(new_row, newColumn)
+    costSwap = CostSwap(new_grid, container.coord, target_coord)
+
+    # save the old coordinates and copy the actual objects over to the grid
+    old_row, old_col = container.coord.row, container.coord.col
+    source_container = new_grid[old_row][old_col]
+    destination_container = new_grid[new_row][newColumn]
+
+    new_source_container = copy.deepcopy(source_container)
+    new_destination_container = copy.deepcopy(destination_container)
+
+    new_source_container.coord = Coordinate(new_row, newColumn)
+    new_destination_container.coord = Coordinate(old_row, old_col)
 
     # swap empty and containers positions above it
-    emptyCoord = emptySpace.coord
-    currCoord = container.coord
-    grid[currCoord.row][currCoord.col] = emptySpace
-    grid[emptyCoord.row][emptyCoord.col] = container
+    new_grid[new_row][newColumn] = new_source_container
+    new_grid[old_row][old_col] = new_destination_container
+    # emptyCoord = emptySpace.coord
+    # currCoord = container.coord
+    # new_grid[currCoord.row][currCoord.col] = emptySpace
+    # new_grid[emptyCoord.row][emptyCoord.col] = container
 
-    return costSwap
+    return costSwap, new_grid
 
 # returns the amount the crane needs to move to get from col1 to col2
-def CostSwap(grid, col1, col2):
-    raise NotImplementedError("need to implement this!")
+def CostSwap(grid, coord1, coord2):
+    return abs(coord1.row - coord2.row) + abs(coord1.col - coord2.col)
 
 def Height(grid:numpy.ndarray, column):
     height = 0
@@ -126,6 +153,7 @@ def ParseFile(lines):
         # get plain text [01, 01], {00000}, NAN
         parts = line.split(", ")
         # get int representation of the coordinate [1,1]
+        print(parts)
         x, y = parts[0].strip("[]").split(",")
         coord = Coordinate(int(x) - 1, int(y) - 1)
         # get the id "{00000}"
