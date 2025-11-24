@@ -1,12 +1,10 @@
 import kivy
 from kivy.lang import Builder
 from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.widget import Widget
+from kivy.uix.screenmanager import ScreenManager
+from kivy.core.window import Window
+
 kivy.require('2.3.1')
-
-from components import balance_ship as BalanceShip
-
 from screens.input.input_screen import InputScreen
 from screens.ship.ship_screen import ShipScreen
 
@@ -21,12 +19,10 @@ class MainApp(App):
         sm.add_widget(ShipScreen(name='ship_screen'))
 
         return sm
+    def on_start(self):
+        Window.maximize()
 
 def main():
-    #filepath = input("Please provide the file to solve for: ")
-    #file = BalanceShip.ReadFile(filepath)
-    #manifest = BalanceShip.ParseFile(file)
-    #startGrid = BalanceShip.CreateGrid(manifest)
     app = MainApp()
     app.run()
 
