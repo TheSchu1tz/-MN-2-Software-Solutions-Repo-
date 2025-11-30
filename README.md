@@ -35,11 +35,11 @@ To run the program:
 
 ---
 
-# Project 3: Options to Run
+# Project 3: A-Star Ship Balancing
 
 To run the program, you have two options:
 
-Option 1: Using PyInstaller
+## Option 1: Using PyInstaller
 
 1. Install dependencies:
    py -3.13 -m pip install -r requirements.txt
@@ -48,7 +48,7 @@ Option 1: Using PyInstaller
 3. Go to the dist folder and run:
    main.exe
 
-Option 2: Using the Python Script Directly
+## Option 2: Using the Python Script Directly
 
 1. Go to A-Star_Algorithm_P3.
 2. Create a virtual environment:
