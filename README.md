@@ -19,8 +19,6 @@ All 3 algorithms are included in the main Python file. Change the variable algNu
 - 2 – Pruning
 - 3 – Nearest Neighbor
 
----
-
 # Project 2: Multiple Drones & Clustering
 
 To run the program:
@@ -32,8 +30,6 @@ To run the program:
 4. Run the algorithm:
    python ./ComputeLargeDronePath.py
 5. Provide the file path when prompted.
-
----
 
 # Project 3: A-Star Ship Balancing
 
