@@ -1,6 +1,6 @@
 -MN-2-Software-Solutions-Repo-P1
 
-Project 1: Single Drone Path
+# Project 1: Single Drone Path
 
 To run the program:
 
@@ -21,7 +21,7 @@ All 3 algorithms are included in the main Python file. Change the variable algNu
 
 ---
 
-Project 2: Multiple Drones & Clustering
+# Project 2: Multiple Drones & Clustering
 
 To run the program:
 
@@ -35,9 +35,11 @@ To run the program:
 
 ---
 
-Project 3: Options to Run
+# Project 3: Options to Run
 
 To run the program, you have two options:
+
+Option 1: Using PyInstaller
 
 1. Install dependencies:
    py -3.13 -m pip install -r requirements.txt
@@ -45,15 +47,17 @@ To run the program, you have two options:
    pyinstaller main.spec
 3. Go to the dist folder and run:
    main.exe
-4. OR use the Python script directly:
-5. Go to A-Star_Algorithm_P3.
-6. Create a virtual environment:
+
+Option 2: Using the Python Script Directly
+
+1. Go to A-Star_Algorithm_P3.
+2. Create a virtual environment:
    py -3.13 -m venv kivyenv
-7. Activate the virtual environment:
+3. Activate the virtual environment:
    ./kivyenv/Scripts/activate
-8. Install dependencies:
+4. Install dependencies:
    py -3.13 -m pip install -r requirements.txt
-9. Run the program:
+5. Run the program:
    python ./main.py
 
 ---
