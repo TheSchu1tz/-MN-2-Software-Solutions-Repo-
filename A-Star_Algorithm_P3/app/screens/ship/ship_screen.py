@@ -1,10 +1,10 @@
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.gridlayout import GridLayout
-from components import balance_ship as BalanceShip
-from components.data_types.container import Container
 from kivy.uix.widget import Widget
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
+from app.components import balance_ship as BalanceShip
+from app.components.data_types.container import Container
 
 class ShipScreen(Screen):
     def on_pre_enter(self, *args):

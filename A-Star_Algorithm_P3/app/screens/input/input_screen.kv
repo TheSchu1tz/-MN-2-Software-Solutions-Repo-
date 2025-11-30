@@ -5,16 +5,19 @@
     BoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        
-        padding:40
-        spacing:20
+        padding: 40
+        spacing: 20
 
         Label:
             font_size: 32
             text: "Please select the manifest: "
-            color: (1, 1, 1, 1)
+            color: 1, 1, 1, 1
 
         FileChooserListView:
             id: filechooser
-            on_selection: input.selected(filechooser.selection)
-            on_selection: root.manager.current = "ship_screen" if filechooser.selection else "input_screen"
+            path: root.repoPath
+            show_hidden: False
+            filters: ["*.txt"]
+
+            on_touch_down:
+                if self.collide_point(*args[1].pos) and args[1].is_double_tap and filechooser.selection: input.selected(filechooser.selection[0]); root.manager.current = "ship_screen"

@@ -1,7 +1,7 @@
 import numpy
 import copy
-from components.data_types.coordinate import Coordinate
-from components.data_types.container import Container
+from app.components.data_types.coordinate import Coordinate
+from app.components.data_types.container import Container
 
 GRID_ROWS = 8
 GRID_COLS = 12
