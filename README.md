@@ -37,11 +37,16 @@ To run the program, you have two options:
 
 ## Option 1: Using PyInstaller
 
-1. Install dependencies:
-   py -3.13 -m pip install -r requirements.txt
-2. Build the executable using PyInstaller:
+1. Go to A-Star_Algorithm_P3.
+2. Create a virtual environment:
+   py -3.13 -m venv kivyenv
+3. Activate the virtual environment:
+   ./kivyenv/Scripts/activate
+4. Install dependencies:
+   pip install -r requirements.txt
+5. Build the executable using PyInstaller:
    pyinstaller main.spec
-3. Go to the dist folder and run:
+6. Go to the dist folder and run:
    main.exe
 
 ## Option 2: Using the Python Script Directly
@@ -52,7 +57,7 @@ To run the program, you have two options:
 3. Activate the virtual environment:
    ./kivyenv/Scripts/activate
 4. Install dependencies:
-   py -3.13 -m pip install -r requirements.txt
+   pip install -r requirements.txt
 5. Run the program:
    python ./main.py
 
