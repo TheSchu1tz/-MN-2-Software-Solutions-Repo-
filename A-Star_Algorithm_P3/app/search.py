@@ -2,9 +2,9 @@ import numpy as np
 import os
 from pathlib import Path
 import itertools
-import components.balance_ship as bs
+import app.components.balance_ship as bs
 from queue import PriorityQueue
-from components.data_types.container import Container
+from app.components.data_types.container import Container
 
 # Node class represents a state in the puzzle and represents the state as a list
 class Node:
@@ -128,7 +128,7 @@ def run_search(starting_grid: np.ndarray):
 
         if bs.CheckBalance(curr_node.state):
             # print(f"DEBUG: SHIP BALANCED. g = {curr_node.g_func}, h = {curr_node.h_func}")
-            return curr_node.state
+            return curr_node
         
         # Make sure we don't search the same state twice
         state_id = curr_node.map_string()

@@ -12,12 +12,8 @@
             padding: dp(10)
             spacing: dp(10)
 
-            Label:
-                text: "Ship Screen"
-                font_size: 32
-                color: 1, 1, 1, 1
-                size_hint_x: 0.7   # keep on left
-
+            InstructionLabel:
+                
             Button:
                 text: "Go back"
                 on_press: root.manager.current = "input_screen"
@@ -31,6 +27,9 @@
             spacing: 2
             padding: 2
 
+<InstructionLabel>:
+    font_size: 32
+    color: 1, 1, 1, 1
 
 <ContainerBox>:
     size_hint: None, None
