@@ -13,6 +13,7 @@ datas = [
     (os.path.join(project_root, 'main.kv'), '.'),
     (os.path.join(project_root, 'app', 'screens', 'input', 'input_screen.kv'), 'app/screens/input'),
     (os.path.join(project_root, 'app', 'screens', 'ship', 'ship_screen.kv'), 'app/screens/ship'),
+    (os.path.join(project_root, 'app', 'screens', 'error', 'error_screen.kv'), 'app/screens/error'),
     (os.path.join(project_root, 'app', 'components'), 'app/components'),
 ]
 
