@@ -12,7 +12,6 @@ from app.components.data_types.container import Container
 from app.components.data_types.coordinate import Coordinate
 from app import search
 
-
 class ShipScreen(Screen):
     instrStack = []
     filepath = ""

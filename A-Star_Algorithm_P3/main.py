@@ -9,6 +9,7 @@ kivy.require('2.3.1')
 import os, sys
 from app.screens.input.input_screen import InputScreen
 from app.screens.ship.ship_screen import ShipScreen
+from app.screens.error.error_screen import ErrorScreen
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -20,14 +21,23 @@ class MainApp(App):
         Builder.load_file(resource_path("main.kv"))
         Builder.load_file(resource_path("app/screens/input/input_screen.kv"))
         Builder.load_file(resource_path("app/screens/ship/ship_screen.kv"))
+        Builder.load_file(resource_path("app/screens/error/error_screen.kv"))
 
         sm = ScreenManager()
         sm.add_widget(InputScreen(name='input_screen'))
         sm.add_widget(ShipScreen(name='ship_screen'))
+        sm.add_widget(ErrorScreen(name='error_screen'))
 
         return sm
+    
     def on_start(self):
         Window.maximize()
+
+    def show_error(self, exception):
+        root = self.root
+        error_screen = root.get_screen("error_screen")
+        error_screen.error_details = str(exception)
+        root.current = "error_screen"
 
 def main():
     app = MainApp()
