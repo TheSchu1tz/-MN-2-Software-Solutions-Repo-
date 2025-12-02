@@ -13,7 +13,8 @@
             spacing: dp(10)
 
             InstructionLabel:
-                
+                id: instruction_label
+
             Button:
                 text: "Go back"
                 on_press: root.manager.current = "input_screen"
@@ -41,6 +42,7 @@
             pos: self.pos
             size: self.size 
     Label: 
+        font_size: 24
         color: root.weight_color
         text: str(root.weight)
         center: root.center

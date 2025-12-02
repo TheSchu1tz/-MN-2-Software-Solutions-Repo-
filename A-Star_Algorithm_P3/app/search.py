@@ -54,8 +54,6 @@ class Node:
         
         return expanded_nodes
 
-                    
-            
 # Using modified CheckBalance function to calculate the heuristic
 def calculate_heuristic(state:np.ndarray):
 
@@ -112,7 +110,7 @@ def calculate_heuristic(state:np.ndarray):
     
 
 # Run the A* search algorithm on a given grid
-def run_search(starting_grid: np.ndarray):
+def run_search(starting_grid: np.ndarray) -> Node:
 
     tie_breaker = itertools.count() # This is just to break ties in the queue when two heuristic values are the same
     q = PriorityQueue()
@@ -143,8 +141,7 @@ def run_search(starting_grid: np.ndarray):
                 q.put((node.f_func, next(tie_breaker), node))
 
     # This is an error condition
-    return None
-
+    raise Exception("No solution found")
 
 # This is for testing, comment this out when running the actual program
 if __name__=="__main__":
