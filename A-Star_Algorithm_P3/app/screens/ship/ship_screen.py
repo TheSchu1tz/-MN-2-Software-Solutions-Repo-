@@ -9,6 +9,7 @@ from kivy.properties import StringProperty
 from pathlib import Path
 from app.components import balance_ship as BalanceShip
 from app.components.data_types.container import Container
+from app.components.data_types.coordinate import Coordinate
 from app import search
 
 
@@ -16,6 +17,8 @@ class ShipScreen(Screen):
     instrStack = []
     filepath = ""
     solution = None
+    instructionCount = 0
+    solutionWritten = False
 
     def on_enter(self, *args):
         Window.bind(on_key_down=self.on_key_down)
@@ -24,6 +27,8 @@ class ShipScreen(Screen):
         Window.unbind(on_key_down=self.on_key_down)
 
     def on_pre_enter(self, *args):
+        self.instructionCount = 0
+        self.solutionWritten = False
         input_screen = self.manager.get_screen('input_screen')
         self.filepath = input_screen.ids.filechooser.selection[0]
         file = BalanceShip.ReadFile(self.filepath)
@@ -35,13 +40,27 @@ class ShipScreen(Screen):
         solution:search.Node = search.run_search(startGrid)
         self.solution = solution
         curr:search.Node = solution
-        self.ids.instruction_label.text = "Solution found. Press Enter to step through instructions."
-        instrStack = []
-        self.instrStack = instrStack
-        while curr.parent != None:
-            instructionText = WriteInstruction(curr.parent, curr)
-            instrStack.append(instructionText)
-            curr = curr.parent
+        if (solution.depth == 0):
+            solutionName = WriteSolutionFile(self.solution.state, self.filepath)
+            self.ids.instruction_label.text = (f"Ship is already balanced. Outbound manifest written to desktop as:"
+                                               + f"\n[b][color=ffff00]{solutionName}[/color][/b]"
+                                               + f"\nDon't forget to email it to the captain."
+                                               + f"\nPress [color=ffff00][b]Enter[/b][/color] when done.")
+            self.solutionWritten = True
+        else:
+            self.ids.instruction_label.text = (
+                f"Solution found. It will take [b][color=ffff00]{solution.depth}[/color][/b] moves and [b][color=ffff00]{solution.cost}[/color][/b] minutes [i](not including crane parking).[/i]"
+            + "\n          - Press [color=ffff00][b]Enter[/b][/color] to step through instructions."
+            + "\n          - Press [color=ffff00][b]Esc[/b][/color] to log a message.\n")
+            instrStack = []
+            self.instrStack = instrStack
+            while curr.parent != None:
+                instructionText = WriteInstruction(curr.parent, curr)
+                instrStack.append(instructionText)
+                curr = curr.parent if curr.parent != None else curr
+            instrStack.append(WriteBeginInstruction(instrStack[-1], startGrid))
+            end = WriteEndInstruction(instrStack[0], solution.state)
+            instrStack.insert(0, end)
 
     def on_key_down(self, window, key, scancode, codepoint, modifier):
         # 13 = Enter, 271 = Numpad Enter
@@ -50,17 +69,28 @@ class ShipScreen(Screen):
         return True
     
     def step_instruction(self):
+        self.instructionCount += 1
+        if self.solutionWritten:
+            self.manager.current = "input_screen"
+
         if not self.instrStack:
             DrawGrid(self.solution.state, self)
-            self.ids.instruction_label.text = "All steps complete."
-            WriteSolutionFile(self.solution.state, self.filepath)
+            solutionName = WriteSolutionFile(self.solution.state, self.filepath)
+            self.ids.instruction_label.text = (f"All steps complete. Outbound manifest written to desktop as:"
+                                               + f"\n[b][color=ffff00]{solutionName}[/color][/b]"
+                                               + f"\nDon't forget to email it to the captain."
+                                               + f"\nPress [color=ffff00][b]Enter[/b][/color] when done.")
+            self.solutionWritten = True
             return
 
         curr = self.instrStack.pop()   # (text, node, r, c)
         text, node, current, target = curr 
 
-        self.ids.instruction_label.text = text
-        DrawGrid(node.state, self, current, target)
+        self.ids.instruction_label.text += f"\n{self.instructionCount}. " + text
+        if isinstance(node, search.Node):
+            DrawGrid(node.state, self, current, target)
+        else:
+            DrawGrid(node, self, current, target)
 
     def resize_cells(self, *args):
         grid = self.ids.grid
@@ -68,7 +98,7 @@ class ShipScreen(Screen):
         if not grid.children:
             return
         
-        rows = grid.rows
+        rows = grid.rows + 1
         cols = grid.cols
 
         # available square size
@@ -78,6 +108,16 @@ class ShipScreen(Screen):
         for child in grid.children:
             child.size = (cell, cell)
 
+# writes an instruction to go from park to first node
+def WriteBeginInstruction(firstInstruction, startGrid):
+    firstCoord = firstInstruction[2]
+    rows = startGrid.shape[0]
+
+    instruction = f"Move crane from [color=00ff00]PARK[/color] to [color=ff0000]{firstCoord}[/color]"
+
+    return instruction, startGrid, Coordinate(rows, 0), firstCoord 
+
+# writes an instruction to go from parent node to child node
 def WriteInstruction(parent:search.Node, child:search.Node):
     parentGrid = parent.state
     childGrid = child.state
@@ -97,43 +137,94 @@ def WriteInstruction(parent:search.Node, child:search.Node):
 
     return f""
 
+# writes an instruction to go from last node to park
+def WriteEndInstruction(lastInstruction, solutionGrid):
+    lastCoord = lastInstruction[3]
+    rows = solutionGrid.shape[0]
+
+    instruction = f"Move crane from [color=00ff00]{lastCoord}[/color] to [color=ff0000]PARK[/color]"
+
+    return instruction, solutionGrid, lastCoord, Coordinate(rows, 0)
+
+# draws the grid, and highlights the cur and target coordinates if they are provided
 def DrawGrid(printGrid, shipScreen:ShipScreen, curCoord=None, targetCoord=None):
     rows, cols = printGrid.shape
 
     grid = shipScreen.ids.grid
     grid.clear_widgets()
-    
-    for r in reversed(range(rows)):
+
+    for r in reversed(range(rows + 1)):  
         for c in range(cols):
+
+            # top row (the new one)
+            if r == rows:
+                if c == 0 and curCoord is not None and curCoord.row == rows: 
+                    color = [0, 1, 0, 1]  # green
+                    weight_color = [0, 0, 0, 0]
+                elif c == 0 and targetCoord is not None and targetCoord.row == rows:
+                    color = [1, 0, 0, 1]  # red
+                    weight_color = [0, 0, 0, 0]
+                elif c == 0:
+                    color = [1, 1, 1, 1]  # white
+                    weight_color = [0, 0, 0, 0]
+                else:       # rest transparent
+                    color = [0, 0, 0, 0]
+                    weight_color = [0, 0, 0, 0]
+
+                grid.add_widget(
+                    ContainerBox(
+                        bg_color=color,
+                        weight=0,
+                        weight_color=weight_color
+                    )
+                )
+                continue
+
+            # Normal grid rows
             container:Container = printGrid[r, c]
-            if curCoord != None and r == curCoord.row and c == curCoord.col:
-                color = [0, 1, 0, 1] # green
-                weight_color = [0, 0, 0, 1] # black
-            elif targetCoord != None and r == targetCoord.row and c == targetCoord.col:
-                color = [1, 0, 0, 1] # red
-                weight_color = [0, 0, 0, 0] # transparent
-            elif (container.item == BalanceShip.UNUSED):
-                color = [1, 1, 1, 1] # white
-                weight_color = [0, 0, 0, 0] # transparent
-            elif (container.item == BalanceShip.NAN):
-                color = [0.1, 0.1, 0.1, 1] # dark gray
-                weight_color = [0, 0, 0, 0] # transparent
+
+            # handling cur (normal vs park)
+            if curCoord is not None and r == curCoord.row and c == curCoord.col and container.item != BalanceShip.UNUSED:
+                color = [0, 1, 0, 1]  # green
+                weight_color = [0, 0, 0, 1]
+            elif curCoord is not None and r == curCoord.row and c == curCoord.col:
+                color = [0, 1, 0, 1]  # green
+                weight_color = [0, 0, 0, 0]
+            # handling target (normal vs park)
+            elif targetCoord is not None and r == targetCoord.row and c == targetCoord.col and container.item != BalanceShip.UNUSED:
+                color = [1, 0, 0, 1]  # red
+                weight_color = [0, 0, 0, 1]
+            elif targetCoord is not None and r == targetCoord.row and c == targetCoord.col:
+                color = [1, 0, 0, 1]  # red
+                weight_color = [0, 0, 0, 0]
+            # handling normal grid spaces
+            elif container.item == BalanceShip.UNUSED:
+                color = [1, 1, 1, 1]  # white
+                weight_color = [0, 0, 0, 0]
+            elif container.item == BalanceShip.NAN:
+                color = [0.1, 0.1, 0.1, 1]
+                weight_color = [0, 0, 0, 0]
             else:
-                color = [0.7, 0.85, 0.9, 1] # light blue
-                weight_color = [0, 0, 0, 1] # black
+                color = [0.7, 0.85, 0.9, 1]
+                weight_color = [0, 0, 0, 1]
+
             grid.add_widget(
                 ContainerBox(
-                    bg_color=color, 
-                    weight=container.weight, 
+                    bg_color=color,
+                    weight=container.weight,
                     weight_color=weight_color
                 )
             )
-    
-    grid.rows = rows
+
+    # tell Kivy how many rows really exist
+    grid.rows = rows + 1
     grid.cols = cols
 
-    shipScreen.ids.grid.bind(size=shipScreen.resize_cells, children=shipScreen.resize_cells)
-    
+    shipScreen.ids.grid.bind(
+        size=shipScreen.resize_cells,
+        children=shipScreen.resize_cells
+    )
+
 def WriteSolutionFile(solution, filepath):
     p = Path(filepath)
 
@@ -147,6 +238,8 @@ def WriteSolutionFile(solution, filepath):
             if i != len(flatSolution) - 1:  # not last
                 line += "\n"
             new_file.write(line)
+    new_file.close()
+    return (p.stem + "OUTBOUND.txt")
 
 class ContainerBox(Widget):
     bg_color = ListProperty([1, 1, 1, 1])
