@@ -172,5 +172,5 @@ if __name__=="__main__":
 
         with open(out_dir / (p.stem + "_SOLUTION.txt"), "x") as new_file:
             for container in final_grid.flat:
-                new_file.write(f"[0{container.coord.row + 1},{container.coord.col + 1}], {{{container.weight}}}, {container.item}\n")
+                new_file.write(f"{container.coord}, {container.weight:05}, {container.item}\n")
     

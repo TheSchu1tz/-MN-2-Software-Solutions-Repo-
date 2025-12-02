@@ -6,6 +6,7 @@ from kivy.core.window import Window
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.properties import StringProperty
+from pathlib import Path
 from app.components import balance_ship as BalanceShip
 from app.components.data_types.container import Container
 from app import search
@@ -13,6 +14,7 @@ from app import search
 
 class ShipScreen(Screen):
     instrStack = []
+    filepath = ""
     solution = None
 
     def on_enter(self, *args):
@@ -23,8 +25,8 @@ class ShipScreen(Screen):
 
     def on_pre_enter(self, *args):
         input_screen = self.manager.get_screen('input_screen')
-        filepath = input_screen.ids.filechooser.selection[0]
-        file = BalanceShip.ReadFile(filepath)
+        self.filepath = input_screen.ids.filechooser.selection[0]
+        file = BalanceShip.ReadFile(self.filepath)
         manifest = BalanceShip.ParseFile(file)
         startGrid = BalanceShip.CreateGrid(manifest)
         DrawGrid(startGrid, self)
@@ -51,6 +53,7 @@ class ShipScreen(Screen):
         if not self.instrStack:
             DrawGrid(self.solution.state, self)
             self.ids.instruction_label.text = "All steps complete."
+            WriteSolutionFile(self.solution.state, self.filepath)
             return
 
         curr = self.instrStack.pop()   # (text, node, r, c)
@@ -131,6 +134,20 @@ def DrawGrid(printGrid, shipScreen:ShipScreen, curCoord=None, targetCoord=None):
 
     shipScreen.ids.grid.bind(size=shipScreen.resize_cells, children=shipScreen.resize_cells)
     
+def WriteSolutionFile(solution, filepath):
+    p = Path(filepath)
+
+    out_dir = Path("p3_solutions")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    flatSolution = solution.flat
+    with open(out_dir / (p.stem + "OUTBOUND.txt"), "w") as new_file:
+        for i, container in enumerate(flatSolution):
+            line = f"{container.coord}, {{{container.weight:05}}}, {container.item}"
+            if i != len(flatSolution) - 1:  # not last
+                line += "\n"
+            new_file.write(line)
+
 class ContainerBox(Widget):
     bg_color = ListProperty([1, 1, 1, 1])
     weight = NumericProperty()
