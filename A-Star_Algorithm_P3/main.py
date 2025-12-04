@@ -11,6 +11,7 @@ from app.screens.input.input_screen import InputScreen
 from app.screens.ship.ship_screen import ShipScreen
 from app.screens.error.error_screen import ErrorScreen
 from app.screens.log.log_screen import LogScreen
+from app.utils.logger import Logger
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -18,6 +19,8 @@ def resource_path(relative_path):
     return os.path.join(os.path.dirname(__file__), relative_path)
 
 class MainApp(App):
+    logger:Logger
+
     def build(self):
         Builder.load_file(resource_path("main.kv"))
         Builder.load_file(resource_path("app/screens/input/input_screen.kv"))
@@ -25,15 +28,21 @@ class MainApp(App):
         Builder.load_file(resource_path("app/screens/error/error_screen.kv"))
         Builder.load_file(resource_path("app/screens/log/log_screen.kv"))
 
+        self.logger = Logger()
         sm = ScreenManager()
         sm.add_widget(InputScreen(name='input_screen'))
-        sm.add_widget(ShipScreen(name='ship_screen'))
+        shipScreen = ShipScreen(name='ship_screen')
+        shipScreen.SetLogger(self.logger)
+        sm.add_widget(shipScreen)
         sm.add_widget(ErrorScreen(name='error_screen'))
         sm.add_widget(LogScreen(name='log_screen'))
         return sm
     
     def on_start(self):
         Window.maximize()
+
+    def on_stop(self):
+        self.logger.WriteSessionLog()
 
     def show_error(self, exception):
         root = self.root

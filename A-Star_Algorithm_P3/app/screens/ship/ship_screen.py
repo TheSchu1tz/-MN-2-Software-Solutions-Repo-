@@ -10,15 +10,21 @@ from pathlib import Path
 from app.components import balance_ship as BalanceShip
 from app.components.data_types.container import Container
 from app.components.data_types.coordinate import Coordinate
+from app.utils.logger import Logger
 from app import search
 
 class ShipScreen(Screen):
     instrStack = []
     filepath = ""
     solution = None
+    prevInstruction = None
     instructionCount = 0
     solutionWritten = False
     pausedForLog = False
+    logger:Logger = None
+
+    def SetLogger(self, logger):
+        self.logger = logger
 
     def on_enter(self, *args):
         Window.bind(on_key_down=self.on_key_down)
@@ -32,20 +38,29 @@ class ShipScreen(Screen):
             self.pausedForLog = False
             log_screen = self.manager.get_screen("log_screen")
             log_message = log_screen.ids.log_input.text 
+            self.logger.LogMessage(log_message)
             return
     
         self.instructionCount = 0
         self.solutionWritten = False
+        self.prevInstruction = None
         input_screen = self.manager.get_screen('input_screen')
         self.filepath = input_screen.ids.filechooser.selection[0]
         file = BalanceShip.ReadFile(self.filepath)
         manifest = BalanceShip.ParseFile(file)
         startGrid = BalanceShip.CreateGrid(manifest)
+        #TODO: log containers on ship
+        numContainers = BalanceShip.NumContainers(startGrid)
+        filename = Path(self.filepath).name
+        self.logger.LogManifestStart(filename, numContainers)
         DrawGrid(startGrid, self)
 
-        self.ids.instruction_label.text = "Computing a solution..."
+        self.ids.instruction_label.text = (f"{filename} has {numContainers} containers\n"
+            f"Computing a solution..."
+        )
         solution:search.Node = search.run_search(startGrid)
         self.solution = solution
+        self.logger.LogSolutionFound(solution.depth, solution.cost)
         curr:search.Node = solution
         if (solution.depth == 0):
             solutionName = WriteSolutionFile(self.solution.state, self.filepath)
@@ -54,6 +69,7 @@ class ShipScreen(Screen):
                                                + f"\nDon't forget to email it to the captain."
                                                + f"\nPress [color=ffff00][b]Enter[/b][/color] when done.")
             self.solutionWritten = True
+            self.logger.LogCycleEnd(solutionName)
         else:
             self.ids.instruction_label.text = (
                 f"Solution found. It will take [b][color=ffff00]{solution.depth}[/color][/b] moves and [b][color=ffff00]{solution.cost}[/color][/b] minutes [i](not including crane parking).[/i]"
@@ -85,6 +101,7 @@ class ShipScreen(Screen):
         self.instructionCount += 1
         if self.solutionWritten:
             self.manager.current = "input_screen"
+            return
 
         if not self.instrStack:
             DrawGrid(self.solution.state, self)
@@ -94,10 +111,15 @@ class ShipScreen(Screen):
                                                + f"\nDon't forget to email it to the captain."
                                                + f"\nPress [color=ffff00][b]Enter[/b][/color] when done.")
             self.solutionWritten = True
+            self.logger.LogCycleEnd(solutionName)
             return
 
-        curr = self.instrStack.pop()   # (text, node, r, c)
+        if self.prevInstruction is not None:
+            if self.prevInstruction[2].row != BalanceShip.GRID_ROWS:
+                self.logger.LogMove(self.prevInstruction[2], self.prevInstruction[3])
+        curr = self.instrStack.pop()   # (text, node, current, target)
         text, node, current, target = curr 
+        self.prevInstruction = curr
 
         self.ids.instruction_label.text += f"\n{self.instructionCount}. " + text
         if isinstance(node, search.Node):

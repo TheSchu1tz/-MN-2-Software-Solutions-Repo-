@@ -30,9 +30,14 @@ class Logger:
             log_file.write(f"{self.GetTime()} Balance solution found, it will require {moves} moves/{minutes} minutes.\n")
         log_file.close()
 
-    def LogMove(self, coord1:Coordinate, coord2:Coordinate):
+    def LogMove(self, coord1, coord2):
         with open(self.out_dir / self.filename, "a") as log_file:
             log_file.write(f"{self.GetTime()} {coord1} was moved to {coord2}\n")
+        log_file.close()
+
+    def LogMessage(self, message:str):
+        with open(self.out_dir / self.filename, "a") as log_file:
+            log_file.write(f"{self.GetTime()} {message}\n")
         log_file.close()
     
     def LogCycleEnd(self, outboundManifest:str):
@@ -41,8 +46,9 @@ class Logger:
         log_file.close()
 
     def GetTime(self):
-        return(f"{self.start.month:02d} {self.start.day:02d} {self.start.year}: "
-                f"{self.start.hour:02d}:{self.start.minute:02d}")
+        time = datetime.now()
+        return(f"{time.month:02d} {time.day:02d} {time.year}: "
+                f"{time.hour:02d}:{time.minute:02d}")
 
     def WriteSessionLog(self):
         out_dir = Path("p3_logs")
