@@ -1,17 +1,71 @@
-# -MN-2-Software-Solutions-Repo-P1
+-MN-2-Software-Solutions-Repo-P1
 
-To run the program for Project 1 (solving a single drone path):
-1. You must first have the latest version of Python installed.
-2. Open the Main Algorithm folder in terminal.
-3. Run pip install -r requirements.txt
-4. From the Main Algorithm folder, run python ./ComputeDronePath.py
-5. Provide the file path for the algorithm to solve for.
+# Project 1: Single Drone Path
 
-Note: All 3 algorithm are present within the main python file. Change the variable 'algNum' to change which algorithm is used. 1 is the random search, 2 is for pruning, 3 is for nearest neighbor.
+To run the program:
 
-To run the program for Project 2 (solving with 1+ drones & clustering):
-1. You must first have the latest version of Python installed.
-2. Open the KNN_Algorithms_P2 folder in terminal.
-3. Run pip install -r requirements.txt
-4. From the Main Algorithm folder, run python ./ComputeLargeDronePath.py
-5. Provide the file path for the algorithm to solve for.
+1. Make sure you have Python 3.13.9 installed.
+2. Open the Main Algorithm folder in the terminal.
+3. Install dependencies:
+   pip install -r requirements.txt
+4. Run the algorithm:
+   python ./ComputeDronePath.py
+5. Provide the file path when prompted.
+
+Note:
+All 3 algorithms are included in the main Python file. Change the variable algNum to select the algorithm:
+
+- 1 – Random Search
+- 2 – Pruning
+- 3 – Nearest Neighbor
+
+# Project 2: Multiple Drones & Clustering
+
+To run the program:
+
+1. Make sure you have Python 3.13.9 installed.
+2. Open the KNN_Algorithms_P2 folder in the terminal.
+3. Install dependencies:
+   pip install -r requirements.txt
+4. Run the algorithm:
+   python ./ComputeLargeDronePath.py
+5. Provide the file path when prompted.
+
+# Project 3: A-Star Ship Balancing
+
+To run the program, you have two options:
+
+## Option 1: Using PyInstaller
+
+1. Go to A-Star_Algorithm_P3.
+2. Create a virtual environment:
+   py -3.13 -m venv kivyenv
+3. Activate the virtual environment:
+   ./kivyenv/Scripts/activate
+4. Install dependencies:
+   pip install -r requirements.txt
+5. Build the executable using PyInstaller:
+   pyinstaller main.spec
+6. Go to the dist folder and run:
+   main.exe
+
+## Option 2: Using the Python Script Directly
+
+1. Go to A-Star_Algorithm_P3.
+2. Create a virtual environment:
+   py -3.13 -m venv kivyenv
+3. Activate the virtual environment:
+   ./kivyenv/Scripts/activate
+4. Install dependencies:
+   pip install -r requirements.txt
+5. Run the program:
+   python ./main.py
+
+---
+
+Notes
+
+- Make sure to always use the correct Python version for each project (py -3.13 for Project 3).
+- Each project folder contains its own requirements.txt and Python scripts.
+- Adjust algNum in Project 1 if you want to switch between algorithms.
+- For Project 2, ensure your input files match the expected format for clustering/multi-drone paths.

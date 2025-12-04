@@ -1,0 +1,57 @@
+#:kivy 2.3.1
+
+<LogScreen>:
+    name: "log_screen"
+    BoxLayout:
+        orientation: 'vertical'
+
+        # Top spacer bar
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            padding: dp(10)
+            spacing: dp(10)
+
+        Label: 
+            markup: True
+            text: "[b][u]Enter the log message below:[/u][/b]"
+            font_size: 42
+            size_hint_y: 0.2
+
+        # Text input section
+        BoxLayout:
+            size_hint_y: 0.6
+            padding: dp(20)
+
+            TextInput:
+                id: log_input
+                font_size: 24
+                multiline: True
+                hint_text: "Type your log message here..."
+                size_hint_y: 1
+
+        # Centered button section
+        BoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            padding: dp(10)
+
+            Widget:
+                size_hint_x: 1
+
+            Button:
+                text: "Submit Log and Go Back"
+                size_hint_x: None
+                width: dp(200)
+                on_release:
+                    app.root.current = "ship_screen"
+
+            Widget:
+                size_hint_x: 1
+
+        # Bottom spacer bar
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            padding: dp(10)
+            spacing: dp(10)

@@ -1,1 +1,5 @@
+*venv*/
+*venv*
 __pycache__
+/A-Star_Algorithm_P3/build/
+/A-Star_Algorithm_P3/dist/

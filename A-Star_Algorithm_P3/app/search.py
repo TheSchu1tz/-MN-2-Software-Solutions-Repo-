@@ -2,9 +2,9 @@ import numpy as np
 import os
 from pathlib import Path
 import itertools
-import components.balance_ship as bs
+import app.components.balance_ship as bs
 from queue import PriorityQueue
-from components.data_types.container import Container
+from app.components.data_types.container import Container
 
 # Node class represents a state in the puzzle and represents the state as a list
 class Node:
@@ -54,8 +54,6 @@ class Node:
         
         return expanded_nodes
 
-                    
-            
 # Using modified CheckBalance function to calculate the heuristic
 def calculate_heuristic(state:np.ndarray):
 
@@ -112,7 +110,7 @@ def calculate_heuristic(state:np.ndarray):
     
 
 # Run the A* search algorithm on a given grid
-def run_search(starting_grid: np.ndarray):
+def run_search(starting_grid: np.ndarray) -> Node:
 
     tie_breaker = itertools.count() # This is just to break ties in the queue when two heuristic values are the same
     q = PriorityQueue()
@@ -128,7 +126,7 @@ def run_search(starting_grid: np.ndarray):
 
         if bs.CheckBalance(curr_node.state):
             # print(f"DEBUG: SHIP BALANCED. g = {curr_node.g_func}, h = {curr_node.h_func}")
-            return curr_node.state
+            return curr_node
         
         # Make sure we don't search the same state twice
         state_id = curr_node.map_string()
@@ -143,8 +141,7 @@ def run_search(starting_grid: np.ndarray):
                 q.put((node.f_func, next(tie_breaker), node))
 
     # This is an error condition
-    return None
-
+    raise Exception("No solution found")
 
 # This is for testing, comment this out when running the actual program
 if __name__=="__main__":
@@ -175,5 +172,5 @@ if __name__=="__main__":
 
         with open(out_dir / (p.stem + "_SOLUTION.txt"), "x") as new_file:
             for container in final_grid.flat:
-                new_file.write(f"[0{container.coord.row + 1},{container.coord.col + 1}], {{{container.weight}}}, {container.item}\n")
+                new_file.write(f"{container.coord}, {container.weight:05}, {container.item}\n")
     

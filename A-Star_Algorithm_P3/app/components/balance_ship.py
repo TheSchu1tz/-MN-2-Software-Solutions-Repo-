@@ -1,7 +1,7 @@
 import numpy
 import copy
-from components.data_types.coordinate import Coordinate
-from components.data_types.container import Container
+from app.components.data_types.coordinate import Coordinate
+from app.components.data_types.container import Container
 
 GRID_ROWS = 8
 GRID_COLS = 12
@@ -9,6 +9,15 @@ GRID_COLS = 12
 UNUSED = "UNUSED"
 NAN = "NAN"
 
+def NumContainers(grid:numpy.ndarray):
+    numContainers = 0
+    for y in range(GRID_ROWS):
+        for x in range(GRID_COLS):
+            container:Container = grid[y][x]
+            if container and container.item != UNUSED and container.item != NAN:
+                numContainers += 1
+    return numContainers
+                
 def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
 
     # First check if the container is movable/ has another container above it
