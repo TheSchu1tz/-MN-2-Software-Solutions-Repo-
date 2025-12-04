@@ -147,33 +147,33 @@ def run_search(starting_grid: np.ndarray):
 
 
 # This is for testing, comment this out when running the actual program
-if __name__=="__main__":
+# if __name__=="__main__":
 
-    input_files = [
-        "test_manifests/ShipCase1.txt",
-        "test_manifests/ShipCase2.txt",
-        "test_manifests/ShipCase3.txt",
-        "test_manifests/ShipCase4.txt",
-        "test_manifests/ShipCase5.txt",
-        "test_manifests/ShipCase6.txt"
-    ]
+#     input_files = [
+#         "test_manifests/ShipCase1.txt",
+#         "test_manifests/ShipCase2.txt",
+#         "test_manifests/ShipCase3.txt",
+#         "test_manifests/ShipCase4.txt",
+#         "test_manifests/ShipCase5.txt",
+#         "test_manifests/ShipCase6.txt"
+#     ]
 
-    for file in input_files:
+#     for file in input_files:
 
-        file_lines = bs.ReadFile(file)
+#         file_lines = bs.ReadFile(file)
 
-        manifest = bs.ParseFile(file_lines)
+#         manifest = bs.ParseFile(file_lines)
 
-        starting_grid = bs.CreateGrid(manifest)
+#         starting_grid = bs.CreateGrid(manifest)
 
-        final_grid = run_search(starting_grid)
+#         final_grid = run_search(starting_grid)
 
-        p = Path(file)
+#         p = Path(file)
 
-        out_dir = Path("test_solutions")
-        out_dir.mkdir(parents=True, exist_ok=True)
+#         out_dir = Path("test_solutions")
+#         out_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(out_dir / (p.stem + "_SOLUTION.txt"), "x") as new_file:
-            for container in final_grid.flat:
-                new_file.write(f"[0{container.coord.row + 1},{container.coord.col + 1}], {{{container.weight}}}, {container.item}\n")
+#         with open(out_dir / (p.stem + "_SOLUTION.txt"), "x") as new_file:
+#             for container in final_grid.flat:
+#                 new_file.write(f"[0{container.coord.row + 1},{container.coord.col + 1}], {{{container.weight}}}, {container.item}\n")
     

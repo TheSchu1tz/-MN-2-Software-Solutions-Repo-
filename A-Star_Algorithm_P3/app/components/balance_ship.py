@@ -2,6 +2,7 @@ import numpy
 import copy
 from components.data_types.coordinate import Coordinate
 from components.data_types.container import Container
+from collections import deque
 
 GRID_ROWS = 8
 GRID_COLS = 12
@@ -49,16 +50,51 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
     # swap empty and containers positions above it
     new_grid[new_row][newColumn] = new_source_container
     new_grid[old_row][old_col] = new_destination_container
-    # emptyCoord = emptySpace.coord
-    # currCoord = container.coord
-    # new_grid[currCoord.row][currCoord.col] = emptySpace
-    # new_grid[emptyCoord.row][emptyCoord.col] = container
+    
 
     return costSwap, new_grid
 
 # returns the amount the crane needs to move to get from col1 to col2
 def CostSwap(grid, coord1, coord2):
-    return abs(coord1.row - coord2.row) + abs(coord1.col - coord2.col)
+    # edge case same coordinate
+    if coord1.row == coord2.row and coord1.col == coord2.col:
+        return 0
+    
+    movements = [(1,0), (-1,0), (0,1), (0,-1)]
+    
+    # set up a bfs
+    visited = set()
+    q = deque()
+
+    q.append((coord1.row, coord1.col, 0))
+    visited.add((coord1.row, coord1.col))
+
+    while q:
+        row, col, dist = q.popleft()
+
+        for row_move, col_move in movements:
+            new_row, new_col = row + row_move, col + col_move
+
+            # boundary check
+            if new_row < 0 or new_row >= GRID_ROWS or new_col < 0 or new_col >= GRID_COLS:
+                continue
+            
+            # check if we looked at this already
+            if (new_row, new_col) in visited:
+                continue
+            
+            # win condition
+            if (new_row, new_col) == (coord2.row, coord2.col):
+                return dist + 1
+
+            check_cell = grid[new_row][new_col]
+
+            if check_cell is None or check_cell.item == UNUSED or check_cell.item == NAN:
+                visited.add((new_row, new_col))
+                q.append((new_row, new_col, dist + 1))
+    
+    #container is immovable
+    return float("inf")
 
 def Height(grid:numpy.ndarray, column):
     height = 0
