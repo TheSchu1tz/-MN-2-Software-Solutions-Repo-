@@ -18,6 +18,7 @@ class ShipScreen(Screen):
     solution = None
     instructionCount = 0
     solutionWritten = False
+    pausedForLog = False
 
     def on_enter(self, *args):
         Window.bind(on_key_down=self.on_key_down)
@@ -26,6 +27,13 @@ class ShipScreen(Screen):
         Window.unbind(on_key_down=self.on_key_down)
 
     def on_pre_enter(self, *args):
+        if self.pausedForLog:
+            # We are returning from the log screen → do NOT reset anything
+            self.pausedForLog = False
+            log_screen = self.manager.get_screen("log_screen")
+            log_message = log_screen.ids.log_input.text 
+            return
+    
         self.instructionCount = 0
         self.solutionWritten = False
         input_screen = self.manager.get_screen('input_screen')
@@ -62,6 +70,12 @@ class ShipScreen(Screen):
             instrStack.insert(0, end)
 
     def on_key_down(self, window, key, scancode, codepoint, modifier):
+        # 27 = Esc key 
+        if key == 27:   # ESC
+            self.pausedForLog = True
+            self.manager.current = "log_screen"
+            return True
+        
         # 13 = Enter, 271 = Numpad Enter
         if key in (13, 271):
             self.step_instruction()

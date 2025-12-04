@@ -10,6 +10,7 @@ import os, sys
 from app.screens.input.input_screen import InputScreen
 from app.screens.ship.ship_screen import ShipScreen
 from app.screens.error.error_screen import ErrorScreen
+from app.screens.log.log_screen import LogScreen
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -22,12 +23,13 @@ class MainApp(App):
         Builder.load_file(resource_path("app/screens/input/input_screen.kv"))
         Builder.load_file(resource_path("app/screens/ship/ship_screen.kv"))
         Builder.load_file(resource_path("app/screens/error/error_screen.kv"))
+        Builder.load_file(resource_path("app/screens/log/log_screen.kv"))
 
         sm = ScreenManager()
         sm.add_widget(InputScreen(name='input_screen'))
         sm.add_widget(ShipScreen(name='ship_screen'))
         sm.add_widget(ErrorScreen(name='error_screen'))
-
+        sm.add_widget(LogScreen(name='log_screen'))
         return sm
     
     def on_start(self):
