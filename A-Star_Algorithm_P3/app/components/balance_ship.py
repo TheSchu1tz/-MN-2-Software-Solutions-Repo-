@@ -10,7 +10,22 @@ GRID_COLS = 12
 UNUSED = "UNUSED"
 NAN = "NAN"
 
+def NumContainers(grid:numpy.ndarray):
+    numContainers = 0
+    for y in range(GRID_ROWS):
+        for x in range(GRID_COLS):
+            container:Container = grid[y][x]
+            if container and container.item != UNUSED and container.item != NAN:
+                numContainers += 1
+    return numContainers
+                
 def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
+
+    # input checking, return inf so move is not considered
+    if grid is None or container is None:
+        return float('inf'), grid
+    if newColumn < 0 or newColumn >= GRID_COLS:
+        return float('inf'), grid
 
     # First check if the container is movable/ has another container above it
     curr_row = container.coord.row
@@ -31,6 +46,10 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
             # emptySpace = check
             new_row = i
             break
+
+    # no empty slot was found
+    if new_row is None:
+        return float('inf'), grid       
 
     # calculate cost of swap
     target_coord = Coordinate(new_row, newColumn)
@@ -56,6 +75,11 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
 
 # returns the amount the crane needs to move to get from col1 to col2
 def CostSwap(grid, coord1, coord2):
+    # input checking
+    if coord1 is None or coord2 is None:
+        return float('inf')
+    if not hasattr(coord1, 'row') or not hasattr(coord2, 'row'):
+        return float('inf')
     # edge case same coordinate
     if coord1.row == coord2.row and coord1.col == coord2.col:
         return 0
@@ -97,6 +121,10 @@ def CostSwap(grid, coord1, coord2):
     return float("inf")
 
 def Height(grid:numpy.ndarray, column):
+    # invalid inputs
+    if column < 0 or column >= GRID_COLS:
+        return 0
+
     height = 0
     for i in range(GRID_ROWS):
         container:Container = grid[i][column]
@@ -107,6 +135,11 @@ def Height(grid:numpy.ndarray, column):
     return height
 
 def CheckBalance(grid:numpy.ndarray):
+    # input validation 
+    if not IsValidGrid(grid):
+        print("Warning: Invalid grid passed to CheckBalance function.")
+        return True # not sure what to do with this in this error case so leaving this here
+    
     # Get Weights
     left_weights = []
     right_weights = []
@@ -175,12 +208,14 @@ def CreateGrid(manifest):
         grid[coord.row, coord.col] = manifest[i]
     return grid
 
-# returns array of strings read from filename
+# returns array of strings read from filename (added error checking)
 def ReadFile(filename):
-    file = open(filename, mode = 'r', encoding = 'utf-8-sig')
-    lines = file.readlines()
-    file.close()
-    return lines
+    try:
+        with open(filename, mode='r', encoding='utf-8-sig') as file:
+            return file.readlines()
+    except Exception as e:
+        print(f"Error reading file '{filename}': {e}")
+        return []
 
 # creates data representation of manifest
 def ParseFile(lines):
@@ -200,6 +235,20 @@ def ParseFile(lines):
         container = Container(coord, weight, item)
         manifest.append(container)
     return manifest
+
+# parameter checking
+def IsValidGrid(grid):
+    if grid is None:
+        return False
+    if not hasattr(grid, "shape"):
+        return False
+    if len(grid.shape) != 2:
+        return False
+    rows, cols = grid.shape
+    if rows <= 0 or cols <= 0:
+        return False
+    return True
+
 
 # TEST MAIN
 # def main():

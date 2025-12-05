@@ -1,0 +1,50 @@
+#:kivy 2.3.1
+
+<ErrorScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        # Top spacer bar
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            padding: dp(10)
+            spacing: dp(10)
+
+        Label: 
+            markup: True
+            text: "[b][u]An unexpected error has occurred![/u][/b]"
+            font_size: 42
+            size_hint_y: 0.2
+
+        Label:
+            id: error_label
+            text: root.error_details
+            size_hint_y: 0.5
+            font_size: 32
+
+        # Centered button section
+        BoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            padding: dp(10)
+
+            Widget:
+                size_hint_x: 1
+
+            Button:
+                text: "Back to Input"
+                size_hint_x: None
+                width: dp(200)
+                on_release:
+                    app.root.current = "input_screen"
+
+            Widget:
+                size_hint_x: 1
+
+        # Bottom spacer bar
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            padding: dp(10)
+            spacing: dp(10)
