@@ -54,58 +54,74 @@ class Node:
         
         return expanded_nodes
 
+# Helper function for getting the weights of both sides in a state
+def get_side_comparison(state:np.ndarray):
+        #Get Weights of both sides
+        left_weight = 0
+        right_weight = 0
+        mid_col = bs.GRID_COLS // 2
+
+        for y in range(bs.GRID_ROWS):
+            for x in range(bs.GRID_COLS):
+                container:Container = state[y][x]
+                if container and container.item != bs.UNUSED and container.item != bs.NAN:
+                    if x < mid_col:
+                        left_weight += container.weight
+                    else:
+                        right_weight += container.weight
+        
+        #Figure out who is heavier
+        if left_weight > right_weight:
+            heavy_cols = range(0, mid_col)     
+            light_cols = range(mid_col, bs.GRID_COLS) 
+        else:
+            heavy_cols = range(mid_col, bs.GRID_COLS)
+            light_cols = range(0, mid_col)
+    
+        return left_weight, right_weight, light_cols, heavy_cols
+
 # Using modified CheckBalance function to calculate the heuristic
 def calculate_heuristic(state:np.ndarray):
 
     if bs.CheckBalance(state): # Edge Case
         return 0
     
-    #Get Weights of both sides
-    left_weight = 0
-    right_weight = 0
-    mid_col = bs.GRID_COLS // 2
-
-    for y in range(bs.GRID_ROWS):
-        for x in range(bs.GRID_COLS):
-            container:Container = state[y][x]
-            if container and container.item != bs.UNUSED and container.item != bs.NAN:
-                if x < mid_col:
-                    left_weight += container.weight
-                else:
-                    right_weight += container.weight
-    
-    #Figure out who is heavier
-    if left_weight > right_weight:
-        heavy_cols = range(0, mid_col)     
-        light_cols = range(mid_col, bs.GRID_COLS) 
-    else:
-        heavy_cols = range(mid_col, bs.GRID_COLS)
-        light_cols = range(0, mid_col)
-
-    min_h = float('inf') 
+    left_weight, right_weight, light_cols, heavy_cols = get_side_comparison(state)
     
     # Search for all movable containers on the heavy side
-    from_columns = []
+    from_containers = []
     for column in heavy_cols:
         for row in range(bs.GRID_ROWS -1, -1, -1):
             container = state[row][column]
             if  container.item != bs.UNUSED: 
                 if container.item != bs.NAN:
-                    from_columns.append(column) # Found a movable container
+                    from_containers.append(container) # Found a movable container
                 break
     
     # Search for all possible columns on light side
-    to_columns = []
+    to_cells = []
     for column in light_cols:
-        if state[bs.GRID_ROWS - 1][column].item == bs.UNUSED:
-            to_columns.append(column)
+        target = -1
+        for row in range(bs.GRID_ROWS -1, -1, -1):
+            container = state[row][column]
+            if  container.item != bs.UNUSED: 
+                target = row # Found an empty cell to move the container to
+                break
+            
+        row_placement = target + 1 # Place container ontop of floor
+        if row_placement < bs.GRID_ROWS:
+            to_cells.append((row_placement, column))
+    
+    min_h = float('inf')
     
     #Get the heuristic value
-    for start in from_columns:
-        for end in to_columns:
-            dist = abs(start - end)
+    for start in from_containers:
+        for end_row, end_col in to_cells:
+            dist = abs(start.coord.col - end_col) + abs(start.coord.row - end_row)
+
             if dist < min_h:
                 min_h = dist
+
     return min_h
     
 
@@ -117,12 +133,16 @@ def run_search(starting_grid: np.ndarray) -> Node:
     visited = set()
 
     init_state = Node(starting_grid) # Convert the grid to a Node type
+
+    # Adding deficit to a queue to prioritize useful moves
+    l_weight, r_weight, _, _ = get_side_comparison(init_state.state)
+    init_deficit = abs(l_weight - r_weight)
     
     # print(f"DEBUG: STARTING WITH INITIAL H VALUE OF {init_state.h_func}")
-    q.put((init_state.f_func, next(tie_breaker), init_state)) # Add initial state to the queue with heuristic function
+    q.put((init_state.f_func, init_deficit, next(tie_breaker), init_state)) # Add initial state to the queue with heuristic function
 
     while(q): # Start searching by popping elements off the queue
-        _, _, curr_node = q.get()
+        _, _, _, curr_node = q.get()
 
         if bs.CheckBalance(curr_node.state):
             # print(f"DEBUG: SHIP BALANCED. g = {curr_node.g_func}, h = {curr_node.h_func}")
@@ -138,7 +158,10 @@ def run_search(starting_grid: np.ndarray) -> Node:
         
         for node in expanded_nodes:
             if node.map_string() not in visited:
-                q.put((node.f_func, next(tie_breaker), node))
+                l_weight, r_weight, _, _ = get_side_comparison(node.state)
+                new_deficit = abs(l_weight - r_weight)
+
+                q.put((node.f_func, new_deficit, next(tie_breaker), node))
 
     # This is an error condition
     raise Exception("No solution found")
