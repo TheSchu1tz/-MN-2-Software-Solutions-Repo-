@@ -13,6 +13,8 @@ from app.components.data_types.coordinate import Coordinate
 from app.utils.logger import Logger
 from app import search
 
+import time #delete later
+
 class ShipScreen(Screen):
     instrStack = []
     filepath = ""
@@ -58,7 +60,11 @@ class ShipScreen(Screen):
         self.ids.instruction_label.text = (f"{filename} has {numContainers} containers\n"
             f"Computing a solution..."
         )
+        start = time.time()
         solution:search.Node = search.run_search(startGrid)
+        end = time.time()
+        print(f"Took {end - start} secs to find solution of depth {solution.depth}")
+
         self.solution = solution
         self.logger.LogSolutionFound(solution.depth, solution.cost)
         curr:search.Node = solution
@@ -72,7 +78,7 @@ class ShipScreen(Screen):
             self.logger.LogCycleEnd(solutionName)
         else:
             self.ids.instruction_label.text = (
-                f"Solution found. It will take [b][color=ffff00]{solution.depth}[/color][/b] moves and [b][color=ffff00]{solution.cost}[/color][/b] minutes [i](not including crane parking).[/i]"
+                f"Solution found. It will take [b][color=ffff00]{solution.depth}[/color][/b] moves and [b][color=ffff00]{solution.f_func}[/color][/b] minutes [i](not including crane parking).[/i]"
             + "\n          - Press [color=ffff00][b]Enter[/b][/color] to step through instructions."
             + "\n          - Press [color=ffff00][b]Esc[/b][/color] to log a message.\n")
             instrStack = []
