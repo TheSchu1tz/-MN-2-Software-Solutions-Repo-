@@ -5,7 +5,7 @@ from app.components.data_types.coordinate import Coordinate
 class Logger:
     start:datetime
     filename = ""
-    out_dir = Path("p3_logs")
+    out_dir = Path("test_solutions")
 
     def __init__(self):
         self.start = datetime.now()
@@ -67,7 +67,7 @@ class Logger:
                 f"{time.hour:02d}:{time.minute:02d}")
 
     def WriteSessionLog(self):
-        out_dir = Path("p3_logs")
+        out_dir = Path("test_solutions")
         out_dir.mkdir(parents=True, exist_ok=True)
         with open(out_dir / self.filename, "a") as log_file:
             end = datetime.now()
