@@ -183,6 +183,10 @@ def calculate_heuristic(state:np.ndarray):
 # Run the A* search algorithm on a given grid
 def run_search(starting_grid: np.ndarray) -> Node:
 
+    start_time = time.time()
+    time_limit = 240 # 4 minutes
+    wrap_up = False
+
     tie_breaker = itertools.count() # This is just to break ties in the queue when two heuristic values are the same
     q = PriorityQueue()
     visited = set()
@@ -197,6 +201,31 @@ def run_search(starting_grid: np.ndarray) -> Node:
     q.put((init_state.f_func, init_deficit, next(tie_breaker), init_state)) # Add initial state to the queue with heuristic function
 
     while(q): # Start searching by popping elements off the queue
+        
+        # Search has gone on too long time to wrap up using greedy
+        if not wrap_up and (time.time() - start_time > time_limit):
+            print(f"Time limit reached, solution will not be optimal.")
+            wrap_up = True
+
+            #NOTE: This solution is very hacky but we need to speed this up
+            with q.mutex:
+                all_nodes = list(q.queue) 
+                q.queue.clear() # Instantly empty the queue
+            
+            nodes_only = [item[-1] for item in all_nodes]
+            
+            nodes_only.sort(key=lambda n: n.h_func)
+            
+            nodes_only = nodes_only[:50]
+
+            print("Nodes sorted and pruned")
+            for node in nodes_only:
+                l, r, _, _ = get_side_comparison(node.state)
+                deficit = abs(l - r)
+                q.put((node.h_func, deficit, next(tie_breaker), node))
+
+            print("Queue reinitialized, using h_func as priority")
+
         _, _, _, curr_node = q.get()
 
         if bs.CheckBalance(curr_node.state):
@@ -215,8 +244,10 @@ def run_search(starting_grid: np.ndarray) -> Node:
             if node.map_string() not in visited:
                 l_weight, r_weight, _, _ = get_side_comparison(node.state)
                 new_deficit = abs(l_weight - r_weight)
-
-                q.put((node.f_func, new_deficit, next(tie_breaker), node))
+                if wrap_up:
+                    q.put((node.h_func, new_deficit, next(tie_breaker), node))
+                else:
+                    q.put((node.f_func, new_deficit, next(tie_breaker), node))
 
     # This is an error condition
     print("Cannot reach a solution... exiting")
