@@ -21,6 +21,22 @@ class Logger:
         log_file.close()
     
     def LogManifestStart(self, manifest:str, numContainers:int):
+        # Renames log file to have manifest name instead of "KeoghsPort", comment out if not needed
+        manifest_name = Path(manifest).stem
+        new_filename = (
+            f"{manifest_name}_"
+            f"{self.start.month:02d}_{self.start.day:02d}_{self.start.year}_"
+            f"{self.start.hour:02d}{self.start.minute:02d}.txt"
+        )
+
+        current_file = self.out_dir / self.filename
+        new_file = self.out_dir / new_filename
+
+        if current_file.exists() and current_file != new_file:
+            current_file.rename(new_file)
+            self.filename = new_filename
+        # End of renaming log file, comment out if not needed
+
         with open(self.out_dir / self.filename, "a") as log_file:
             log_file.write(f"{self.GetTime()} Manifest {manifest} is opened, there are {numContainers} containers on the ship.\n")
         log_file.close()
