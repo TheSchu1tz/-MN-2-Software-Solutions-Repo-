@@ -33,23 +33,9 @@ To run the program:
 
 # Project 3: A-Star Ship Balancing
 
-To run the program, you have two options:
+To run the program:
 
-## Option 1: Using PyInstaller
-
-1. Go to A-Star_Algorithm_P3.
-2. Create a virtual environment:
-   py -3.13 -m venv kivyenv
-3. Activate the virtual environment:
-   ./kivyenv/Scripts/activate
-4. Install dependencies:
-   pip install -r requirements.txt
-5. Build the executable using PyInstaller:
-   pyinstaller main.spec
-6. Go to the dist folder and run:
-   main.exe
-
-## Option 2: Using the Python Script Directly
+## Using the Python Script Directly
 
 1. Go to A-Star_Algorithm_P3.
 2. Create a virtual environment:
