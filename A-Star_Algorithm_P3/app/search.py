@@ -50,6 +50,10 @@ class Node:
                     continue
 
                 cost, new_state = bs.MoveToColumn(self.state, self.state[container[0]][container[1]], column)
+
+                # Skip adding unreachable nodes
+                if cost == float("inf"):
+                    continue
                 
                 expanded_nodes.append(Node(new_state, self, self.depth + 1, cost, self.g_func + cost))
         
@@ -88,6 +92,11 @@ def calculate_heuristic(state:np.ndarray):
         return 0
     
     left_weight, right_weight, light_cols, heavy_cols = get_side_comparison(state)
+
+    # Calculate how much weight we are trying to move on this turn
+    h_deficit = abs(left_weight - right_weight)
+
+    target = h_deficit / 2.0
     
     # Search for all movable containers on the heavy side
     from_containers = []
@@ -113,16 +122,43 @@ def calculate_heuristic(state:np.ndarray):
         if row_placement < bs.GRID_ROWS:
             to_cells.append((row_placement, column))
     
-    min_h = float('inf')
+    # If these are empty, no possible moves
+    if not to_cells or not from_containers:
+        return float('inf')
     
-    #Get the heuristic value
+    
+    #Get the costs of each available move
+    move_costs = []
     for start in from_containers:
+        min_dist = float('inf')
         for end_row, end_col in to_cells:
             dist = abs(start.coord.col - end_col) + abs(start.coord.row - end_row)
 
-            if dist < min_h:
-                min_h = dist
+            if dist < min_dist:
+                min_dist = dist
+        move_costs.append(min_dist)
 
+    # Grab our weights
+    from_weights = [c.weight for c in from_containers]
+    from_containers.sort(reverse=True)
+
+    # Calculate how many containers we need to move to reach our goal
+    weight_to_move = 0
+    min_containers_to_move = 0
+
+    for weight in from_weights:
+        if weight_to_move >= target:
+            break
+        weight_to_move += weight
+        min_containers_to_move += 1
+    
+    # Edge case: moving all of the containers will still not be enough to reach the target
+    if weight_to_move < target:
+        min_containers_to_move = len(from_containers)
+
+    # Get the H value by summing up the cost of the cheapest moves using the minimum amount of containers to move
+    move_costs.sort()
+    min_h = sum(move_costs[:min_containers_to_move])
     return min_h
     
 
@@ -165,7 +201,8 @@ def run_search(starting_grid: np.ndarray) -> Node:
                 q.put((node.f_func, new_deficit, next(tie_breaker), node))
 
     # This is an error condition
-    raise Exception("No solution found")
+    print("Cannot reach a solution... exiting")
+    return None
 
 # This is for testing, comment this out when running the actual program
 # if __name__=="__main__":
