@@ -275,7 +275,7 @@ def DrawGrid(printGrid, shipScreen:ShipScreen, curCoord=None, targetCoord=None):
 def WriteSolutionFile(solution, filepath):
     p = Path(filepath)
 
-    out_dir = Path("p3_solutions")
+    out_dir = Path("test_solutions")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     flatSolution = solution.flat
