@@ -34,14 +34,11 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
     for x in range(curr_row + 1, GRID_ROWS):
         if grid[x][curr_col].item != UNUSED:
             return float('inf'), grid # Cannot move this container so cost is infinite
-        
-    # create a copy of the grid aka node
-    new_grid = grid.copy()
     
     # find the highest empty space in the new column
     new_row = None
     for i in range(GRID_ROWS):
-        check:Container = new_grid[i][newColumn]
+        check:Container = grid[i][newColumn]
         if check.item == UNUSED:
             # emptySpace = check
             new_row = i
@@ -49,11 +46,18 @@ def MoveToColumn(grid:numpy.ndarray, container:Container, newColumn:int):
 
     # no empty slot was found
     if new_row is None:
-        return float('inf'), grid       
-
+        return float('inf'), grid
+    
     # calculate cost of swap
     target_coord = Coordinate(new_row, newColumn)
-    costSwap = CostSwap(new_grid, container.coord, target_coord)
+    costSwap = CostSwap(grid, container.coord, target_coord)
+
+    # Skip bad costs
+    if costSwap == float('inf'):
+        return float('inf'), grid
+        
+    # create a copy of the grid aka node
+    new_grid = grid.copy()       
 
     # save the old coordinates and copy the actual objects over to the grid
     old_row, old_col = container.coord.row, container.coord.col
