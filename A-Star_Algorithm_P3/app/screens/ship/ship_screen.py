@@ -66,7 +66,7 @@ class ShipScreen(Screen):
         print(f"Took {end - start} secs to find solution of depth {solution.depth}")
 
         self.solution = solution
-        self.logger.LogSolutionFound(solution.depth, solution.cost)
+        self.logger.LogSolutionFound(solution.depth, solution.f_func)
         curr:search.Node = solution
         if (solution.depth == 0):
             solutionName = WriteSolutionFile(self.solution.state, self.filepath)
