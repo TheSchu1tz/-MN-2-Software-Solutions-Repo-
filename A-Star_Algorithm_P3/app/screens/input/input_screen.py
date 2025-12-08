@@ -9,8 +9,11 @@ class InputScreen(Screen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        here = os.path.abspath(__file__)
-        self.repoPath = find_p3_tests_folder()
+        try:
+            self.repoPath = find_folder("test_manifests")
+        except FileNotFoundError:
+            # Default to system root directory
+            self.repoPath = os.path.abspath(os.sep)
 
     def selected(self, filename):
         print("Selected file: ", filename)
@@ -18,7 +21,7 @@ class InputScreen(Screen):
 class InputLayout(Widget):
     filepath = ObjectProperty(None)
 
-def find_p3_tests_folder(target_folder="p3_tests"):
+def find_folder(target_folder="p3_tests"):
     import sys, os
     
     # Resolve starting directory
