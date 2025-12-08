@@ -24,44 +24,19 @@ class ShipScreen(Screen):
     solutionWritten = False
     pausedForLog = False
     logger:Logger = None
+    startGrid = None
 
     def SetLogger(self, logger):
         self.logger = logger
 
     def on_enter(self, *args):
         Window.bind(on_key_down=self.on_key_down)
-
-    def on_leave(self, *args):
-        Window.unbind(on_key_down=self.on_key_down)
-
-    def on_pre_enter(self, *args):
+        # We are returning from the log screen -> do NOT reset anything
         if self.pausedForLog:
-            # We are returning from the log screen → do NOT reset anything
             self.pausedForLog = False
-            log_screen = self.manager.get_screen("log_screen")
-            log_message = log_screen.ids.log_input.text 
-            self.logger.LogMessage(log_message)
             return
-    
-        self.instructionCount = 0
-        self.solutionWritten = False
-        self.prevInstruction = None
-        input_screen = self.manager.get_screen('input_screen')
-        self.filepath = input_screen.ids.filechooser.selection[0]
-        file = BalanceShip.ReadFile(self.filepath)
-        manifest = BalanceShip.ParseFile(file)
-        startGrid = BalanceShip.CreateGrid(manifest)
-        #TODO: log containers on ship
-        numContainers = BalanceShip.NumContainers(startGrid)
-        filename = Path(self.filepath).name
-        self.logger.LogManifestStart(filename, numContainers)
-        DrawGrid(startGrid, self)
-
-        self.ids.instruction_label.text = (f"{filename} has {numContainers} containers\n"
-            f"Computing a solution..."
-        )
         start = time.time()
-        solution, expanded_nodes = search.run_search(startGrid)
+        solution, expanded_nodes = search.run_search(self.startGrid)
         end = time.time()
         print(f"Took {end - start} secs to find solution of depth {solution.depth}")
         print(f"Expanded {expanded_nodes} nodes")
@@ -74,7 +49,8 @@ class ShipScreen(Screen):
             self.ids.instruction_label.text = (f"Ship is already balanced. Outbound manifest written to desktop as:"
                                                + f"\n[b][color=ffff00]{solutionName}[/color][/b]"
                                                + f"\nDon't forget to email it to the captain."
-                                               + f"\nPress [color=ffff00][b]Enter[/b][/color] when done.")
+                                               + f"\nPress [color=ffff00][b]Enter[/b][/color] when done."
+                                               + f"\nPress [color=ffff00][b]Esc[/b][/color] to log a message.\n")
             self.solutionWritten = True
             self.logger.LogCycleEnd(solutionName)
         else:
@@ -88,9 +64,38 @@ class ShipScreen(Screen):
                 instructionText = WriteInstruction(curr.parent, curr)
                 instrStack.append(instructionText)
                 curr = curr.parent if curr.parent != None else curr
-            instrStack.append(WriteBeginInstruction(instrStack[-1], startGrid))
+            instrStack.append(WriteBeginInstruction(instrStack[-1], self.startGrid))
             end = WriteEndInstruction(instrStack[0], solution.state)
             instrStack.insert(0, end)
+
+    def on_leave(self, *args):
+        Window.unbind(on_key_down=self.on_key_down)
+
+    def on_pre_enter(self, *args):
+        if self.pausedForLog:
+            log_screen = self.manager.get_screen("log_screen")
+            log_message = log_screen.ids.log_input.text 
+            self.logger.LogMessage(log_message)
+            return
+    
+        self.instructionCount = 0
+        self.solutionWritten = False
+        self.prevInstruction = None
+        input_screen = self.manager.get_screen('input_screen')
+        self.filepath = input_screen.ids.filechooser.selection[0]
+        file = BalanceShip.ReadFile(self.filepath)
+        manifest = BalanceShip.ParseFile(file)
+        startGrid = BalanceShip.CreateGrid(manifest)
+        self.startGrid = startGrid
+        #TODO: log containers on ship
+        numContainers = BalanceShip.NumContainers(startGrid)
+        filename = Path(self.filepath).name
+        self.logger.LogManifestStart(filename, numContainers)
+        DrawGrid(startGrid, self)
+
+        self.ids.instruction_label.text = (f"{filename} has {numContainers} containers\n"
+            f"Computing a solution..."
+        )
 
     def on_key_down(self, window, key, scancode, codepoint, modifier):
         # 27 = Esc key 
@@ -116,7 +121,8 @@ class ShipScreen(Screen):
             self.ids.instruction_label.text = (f"All steps complete. Outbound manifest written to desktop as:"
                                                + f"\n[b][color=ffff00]{solutionName}[/color][/b]"
                                                + f"\nDon't forget to email it to the captain."
-                                               + f"\nPress [color=ffff00][b]Enter[/b][/color] when done.")
+                                               + f"\nPress [color=ffff00][b]Enter[/b][/color] when done."
+                                               + f"\nPress [color=ffff00][b]Esc[/b][/color] to log a message.\n")
             self.solutionWritten = True
             self.logger.LogCycleEnd(solutionName)
             return
@@ -207,7 +213,7 @@ def DrawGrid(printGrid, shipScreen:ShipScreen, curCoord=None, targetCoord=None):
                     color = [1, 0, 0, 1]  # red
                     weight_color = [0, 0, 0, 0]
                 elif c == 0:
-                    color = [1, 1, 1, 1]  # white
+                    color = [.5, .5, .5, 1]  # grey
                     weight_color = [0, 0, 0, 0]
                 else:       # rest transparent
                     color = [0, 0, 0, 0]
@@ -270,7 +276,7 @@ def DrawGrid(printGrid, shipScreen:ShipScreen, curCoord=None, targetCoord=None):
 def WriteSolutionFile(solution, filepath):
     p = Path(filepath)
 
-    out_dir = Path("p3_solutions")
+    out_dir = Path("test_solutions")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     flatSolution = solution.flat

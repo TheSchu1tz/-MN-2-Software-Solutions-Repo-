@@ -5,7 +5,7 @@ from app.components.data_types.coordinate import Coordinate
 class Logger:
     start:datetime
     filename = ""
-    out_dir = Path("p3_logs")
+    out_dir = Path("test_solutions")
 
     def __init__(self):
         self.start = datetime.now()
@@ -21,7 +21,6 @@ class Logger:
         log_file.close()
     
     def LogManifestStart(self, manifest:str, numContainers:int):
-
         # Renames log file to have manifest name instead of "KeoghsPort", comment out if not needed
         manifest_name = Path(manifest).stem
         new_filename = (
@@ -37,7 +36,6 @@ class Logger:
             current_file.rename(new_file)
             self.filename = new_filename
         # End of renaming log file, comment out if not needed
-        
         with open(self.out_dir / self.filename, "a") as log_file:
             log_file.write(f"{self.GetTime()} Manifest {manifest} is opened, there are {numContainers} containers on the ship.\n")
         log_file.close()
@@ -68,7 +66,7 @@ class Logger:
                 f"{time.hour:02d}:{time.minute:02d}")
 
     def WriteSessionLog(self):
-        out_dir = Path("p3_logs")
+        out_dir = Path("test_solutions")
         out_dir.mkdir(parents=True, exist_ok=True)
         with open(out_dir / self.filename, "a") as log_file:
             end = datetime.now()
