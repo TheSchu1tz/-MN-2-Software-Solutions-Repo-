@@ -111,6 +111,7 @@ def calculate_heuristic(state:np.ndarray):
             if  container.item != bs.UNUSED: 
                 if container.item != bs.NAN:
                     from_containers.append(container) # Found a movable container
+                    break
                 
     
     # Search for all possible columns on light side
@@ -131,44 +132,51 @@ def calculate_heuristic(state:np.ndarray):
     if not to_cells or not from_containers:
         return float('inf')
     
-    
-    #Get the costs of each available move
-    move_costs = []
+    min_h = float('inf')
+
     for start in from_containers:
-        min_dist = float('inf')
         for end_row, end_col in to_cells:
             dist = abs(start.coord.col - end_col) + abs(start.coord.row - end_row)
 
-            if dist < min_dist:
-                min_dist = dist
-        move_costs.append(min_dist)
+            if dist < min_h:
+                min_h = dist
+    # #Get the costs of each available move
+    # move_costs = []
+    # for start in from_containers:
+    #     min_dist = float('inf')
+    #     for end_row, end_col in to_cells:
+    #         dist = abs(start.coord.col - end_col) + abs(start.coord.row - end_row)
 
-    # Grab our weights
-    from_weights = [c.weight for c in from_containers]
-    from_weights.sort(reverse=True)
+    #         if dist < min_dist:
+    #             min_dist = dist
+    #     move_costs.append(min_dist)
 
-    # Calculate how many containers we need to move to reach our goal
-    weight_to_move = 0
-    min_containers_to_move = 0
+    # # Grab our weights
+    # from_weights = [c.weight for c in from_containers]
+    # from_weights.sort(reverse=True)
 
-    for weight in from_weights:
-        weight_to_move += weight
-        min_containers_to_move += 1
+    # # Calculate how many containers we need to move to reach our goal
+    # weight_to_move = 0
+    # min_containers_to_move = 0
 
-        new_heavy = max(left_weight, right_weight) - weight_to_move
-        new_light = min(left_weight, right_weight) + weight_to_move
+    # for weight in from_weights:
+    #     weight_to_move += weight
+    #     min_containers_to_move += 1
 
-        if abs(new_heavy - new_light) <= (left_weight + right_weight) * 0.10:
-            break
+    #     new_heavy = max(left_weight, right_weight) - weight_to_move
+    #     new_light = min(left_weight, right_weight) + weight_to_move
+
+    #     if abs(new_heavy - new_light) <= (left_weight + right_weight) * 0.10:
+    #         break
         
     
-    # Edge case: moving all of the containers will still not be enough to reach the target
-    if min_containers_to_move > len(from_containers):
-        min_containers_to_move = len(from_containers)
+    # # Edge case: moving all of the containers will still not be enough to reach the target
+    # if min_containers_to_move > len(from_containers):
+    #     min_containers_to_move = len(from_containers)
 
-    # Get the H value by summing up the cost of the cheapest moves using the minimum amount of containers to move
-    move_costs.sort()
-    min_h = sum(move_costs[:min_containers_to_move])
+    # # Get the H value by summing up the cost of the cheapest moves using the minimum amount of containers to move
+    # move_costs.sort()
+    # min_h = sum(move_costs[:min_containers_to_move])
     return min_h
     
 
