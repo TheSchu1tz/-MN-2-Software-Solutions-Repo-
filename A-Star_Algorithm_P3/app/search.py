@@ -201,7 +201,7 @@ def run_search(starting_grid: np.ndarray) -> Node:
 
         if bs.CheckBalance(curr_node.state):
             # print(f"DEBUG: SHIP BALANCED. g = {curr_node.g_func}, h = {curr_node.h_func}")
-            return curr_node
+            return curr_node, len(visited)
         
         # Make sure we don't search the same state twice
         state_id = curr_node.map_string()
@@ -220,7 +220,7 @@ def run_search(starting_grid: np.ndarray) -> Node:
 
     # This is an error condition
     print("Cannot reach a solution... exiting")
-    return None
+    return None, None
 
 # This is for testing, comment this out when running the actual program
 # if __name__=="__main__":
