@@ -1,7 +1,0 @@
-12 08 2025: 12:30 Program was started.
-12 08 2025: 12:30 Manifest ShipCase6_adv.txt is opened, there are 9 containers on the ship.
-12 08 2025: 12:31 Balance solution found, it will require 2 moves/12 minutes.
-12 08 2025: 12:31 [04,03] was moved to [01,07]
-12 08 2025: 12:31 [03,03] was moved to [02,07]
-12 08 2025: 12:31 Finished a Cycle. Manifest ShipCase6_advOUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
-12 08 2025: 12:31 Program was shut down.

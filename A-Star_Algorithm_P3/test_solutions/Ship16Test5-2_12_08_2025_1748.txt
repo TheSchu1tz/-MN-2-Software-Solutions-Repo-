@@ -1,9 +1,0 @@
-12 08 2025: 17:48 Program was started.
-12 08 2025: 17:48 Manifest Ship16Test2-2.txt is opened, there are 16 containers on the ship.
-12 08 2025: 17:48 Balance solution found, it will require 0 moves/0 minutes.
-12 08 2025: 17:48 Finished a Cycle. Manifest Ship16Test2-2OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
-12 08 2025: 17:48 Manifest Ship16Test4.txt is opened, there are 16 containers on the ship.
-12 08 2025: 17:48 Balance solution found, it will require 1 moves/3 minutes.
-12 08 2025: 17:49 [01,06] was moved to [03,07]
-12 08 2025: 17:49 Finished a Cycle. Manifest Ship16Test4OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
-12 08 2025: 17:49 Manifest Ship16Test5-2.txt is opened, there are 15 containers on the ship.

@@ -1,4 +1,0 @@
-12 08 2025: 18:09 Program was started.
-12 08 2025: 18:09 Manifest Ship16Test3-2.txt is opened, there are 16 containers on the ship.
-12 08 2025: 18:14 Balance solution found, it will require 11 moves/91 minutes.
-12 08 2025: 18:15 Manifest Ship16Test3-2.txt is opened, there are 16 containers on the ship.
