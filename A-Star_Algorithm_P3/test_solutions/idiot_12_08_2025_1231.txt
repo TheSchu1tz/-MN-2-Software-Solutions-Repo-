@@ -1,0 +1,14 @@
+12 08 2025: 12:31 Program was started.
+12 08 2025: 12:31 Manifest idiot.txt is opened, there are 16 containers on the ship.
+12 08 2025: 12:35 Balance solution found, it will require 9 moves/83 minutes.
+12 08 2025: 12:36 [01,09] was moved to [01,08]
+12 08 2025: 12:36 [01,08] was moved to [01,07]
+12 08 2025: 12:36 [01,10] was moved to [01,05]
+12 08 2025: 12:36 [07,11] was moved to [02,01]
+12 08 2025: 12:36 [06,11] was moved to [03,01]
+12 08 2025: 12:36 [05,11] was moved to [04,01]
+12 08 2025: 12:36 [04,11] was moved to [05,01]
+12 08 2025: 12:36 [03,11] was moved to [06,01]
+12 08 2025: 12:36 [07,12] was moved to [07,01]
+12 08 2025: 12:36 Finished a Cycle. Manifest idiotOUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
+12 08 2025: 12:39 Program was shut down.

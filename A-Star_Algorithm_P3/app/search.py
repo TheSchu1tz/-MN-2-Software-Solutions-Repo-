@@ -184,7 +184,7 @@ def calculate_heuristic(state:np.ndarray):
 def run_search(starting_grid: np.ndarray) -> Node:
 
     start_time = time.time()
-    time_limit = 240 # 4 minutes
+    time_limit = 300 # 5 minutes
     wrap_up = False
 
     tie_breaker = itertools.count() # This is just to break ties in the queue when two heuristic values are the same
@@ -207,7 +207,7 @@ def run_search(starting_grid: np.ndarray) -> Node:
             print(f"Time limit reached, solution will not be optimal.")
             wrap_up = True
 
-            #NOTE: This solution is very hacky but we need to speed this up
+            # This solution is very hacky but we need to speed this up, basically just ignoring the PriorityQueue class safety to get the nodes fast
             with q.mutex:
                 all_nodes = list(q.queue) 
                 q.queue.clear() # Instantly empty the queue

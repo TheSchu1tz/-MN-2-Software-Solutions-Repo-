@@ -1,0 +1,25 @@
+12 08 2025: 12:41 Program was started.
+12 08 2025: 12:41 Manifest ShipCase1.txt is opened, there are 0 containers on the ship.
+12 08 2025: 12:41 Balance solution found, it will require 0 moves/0 minutes.
+12 08 2025: 12:41 Finished a Cycle. Manifest ShipCase1OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
+12 08 2025: 12:41 Manifest ShipCase2.txt is opened, there are 1 containers on the ship.
+12 08 2025: 12:41 Balance solution found, it will require 0 moves/0 minutes.
+12 08 2025: 12:41 Finished a Cycle. Manifest ShipCase2OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
+12 08 2025: 12:41 Manifest ShipCase3.txt is opened, there are 2 containers on the ship.
+12 08 2025: 12:41 Balance solution found, it will require 1 moves/1 minutes.
+12 08 2025: 12:41 [01,06] was moved to [01,07]
+12 08 2025: 12:41 Finished a Cycle. Manifest ShipCase3OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
+12 08 2025: 12:41 Manifest ShipCase4.txt is opened, there are 3 containers on the ship.
+12 08 2025: 12:41 Balance solution found, it will require 2 moves/8 minutes.
+12 08 2025: 12:41 [02,02] was moved to [02,01]
+12 08 2025: 12:41 [01,02] was moved to [01,07]
+12 08 2025: 12:41 Finished a Cycle. Manifest ShipCase4OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
+12 08 2025: 12:41 Manifest ShipCase5.txt is opened, there are 6 containers on the ship.
+12 08 2025: 12:41 Balance solution found, it will require 2 moves/5 minutes.
+12 08 2025: 12:41 [01,06] was moved to [01,07]
+12 08 2025: 12:41 [01,08] was moved to [02,05]
+12 08 2025: 12:41 Finished a Cycle. Manifest ShipCase5OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
+12 08 2025: 12:41 Manifest ShipCase6.txt is opened, there are 6 containers on the ship.
+12 08 2025: 12:41 Balance solution found, it will require 1 moves/6 minutes.
+12 08 2025: 12:41 [01,03] was moved to [01,07]
+12 08 2025: 12:41 Finished a Cycle. Manifest ShipCase6OUTBOUND.txt was written to desktop, and a reminder pop-up to operator to send file was displayed.
