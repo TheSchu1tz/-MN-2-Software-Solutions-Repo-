@@ -36,7 +36,6 @@ class Logger:
             current_file.rename(new_file)
             self.filename = new_filename
         # End of renaming log file, comment out if not needed
-
         with open(self.out_dir / self.filename, "a") as log_file:
             log_file.write(f"{self.GetTime()} Manifest {manifest} is opened, there are {numContainers} containers on the ship.\n")
         log_file.close()

@@ -36,9 +36,10 @@ class ShipScreen(Screen):
             self.pausedForLog = False
             return
         start = time.time()
-        solution:search.Node = search.run_search(self.startGrid)
+        solution, expanded_nodes = search.run_search(self.startGrid)
         end = time.time()
         print(f"Took {end - start} secs to find solution of depth {solution.depth}")
+        print(f"Expanded {expanded_nodes} nodes")
 
         self.solution = solution
         self.logger.LogSolutionFound(solution.depth, solution.f_func)
